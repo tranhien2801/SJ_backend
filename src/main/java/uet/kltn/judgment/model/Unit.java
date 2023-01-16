@@ -17,7 +17,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "unit")
+@Table(name = "`unit`")
 @Where(clause = "state != 3")
 public class Unit extends BaseEntity{
         @Column(name = "`unit_name`", columnDefinition = "VARCHAR(255)", nullable = false)

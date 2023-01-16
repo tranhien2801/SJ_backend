@@ -11,6 +11,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.sql.Date;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -73,12 +74,22 @@ public class User extends BaseEntity{
     @Column(name = "`number_employee`", columnDefinition = "INT", nullable = true)
     private int number_employee;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<UserCaseType> userCaseTypes;
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<UserFunction> userFunctions;
+    @ManyToMany
+    @JoinTable(name = "user_case_type",
+                joinColumns = @JoinColumn(name = "user_uid", referencedColumnName = "uid"),
+                inverseJoinColumns = @JoinColumn(name = "case_type_uid", referencedColumnName = "uid"))
+    private Set<CaseType> caseTypes;
 
+    @ManyToMany
+    @JoinTable(name = "user_function",
+                joinColumns = @JoinColumn(name = "user_uid", referencedColumnName = "uid"),
+                inverseJoinColumns = @JoinColumn(name = "function_uid", referencedColumnName = "uid"))
+    private Set<Function> functions;
 
+    @ManyToMany
+    @JoinTable(name = "judgment_liked",
+            joinColumns = @JoinColumn(name = "user_uid", referencedColumnName = "uid"),
+            inverseJoinColumns = @JoinColumn(name = "judgment_uid", referencedColumnName = "uid"))
+    private Set<Judgment> judgments;
 
 }
