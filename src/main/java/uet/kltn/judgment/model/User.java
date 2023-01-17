@@ -7,9 +7,13 @@ import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
+import uet.kltn.judgment.dto.request.auth.SignUpRequestDto;
+import uet.kltn.judgment.dto.request.auth.UpdateUserRequestDto;
+import uet.kltn.judgment.util.Utils;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -91,5 +95,40 @@ public class User extends BaseEntity{
             joinColumns = @JoinColumn(name = "user_uid", referencedColumnName = "uid"),
             inverseJoinColumns = @JoinColumn(name = "judgment_uid", referencedColumnName = "uid"))
     private Set<Judgment> judgments;
+
+    @Column(name = "`power`", columnDefinition = "TINYINT DEFAULT 2", nullable = false)
+    private Integer power;
+
+
+    @Column(name = "`last_login`", columnDefinition = "BIGINT")
+    private LocalDateTime lastLogin;
+
+    public User(String uid, int state, String password, String name, LocalDateTime created, LocalDateTime
+            modified, String email, String phoneNumber, String description, String avatar, Integer gender,
+                Date birthday, Integer power) {
+        super();
+        this.setUid(uid);
+        this.avatar = avatar;
+        this.setState(state);
+        this.password = password;
+        this.name = name;
+        this.setCreated(created);
+        this.setModified(modified);
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.description = description;
+        this.gender = gender;
+        this.birthday = birthday;
+        this.power = power;
+    }
+
+
+    public void update(UpdateUserRequestDto updateUserRequestDto) {
+        this.setModified(LocalDateTime.now());
+        this.name = updateUserRequestDto.getName();
+        this.email = updateUserRequestDto.getEmail();
+        this.phoneNumber = updateUserRequestDto.getPhoneNumber();
+        this.description = updateUserRequestDto.getDescription();
+    }
 
 }
