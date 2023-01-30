@@ -15,7 +15,7 @@ import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.auth.SignUpRequestDto;
 import uet.kltn.judgment.dto.request.auth.UpdateUserRequestDto;
-import uet.kltn.judgment.dto.response.UserResponseDto;
+import uet.kltn.judgment.dto.response.auth.UserResponseDto;
 import uet.kltn.judgment.model.User;
 import uet.kltn.judgment.respository.UserRepository;
 import uet.kltn.judgment.util.Utils;
@@ -38,7 +38,6 @@ public class UserService {
 
     @Transactional
     public User createNewUser(SignUpRequestDto signUpRequestDto, boolean isEmailUsername) {
-
         // Creating user's account
         User user = new User(
                 Utils.uuid(),
@@ -53,7 +52,8 @@ public class UserService {
                 null,
                 null,
                 null,
-                signUpRequestDto.getRole());
+                signUpRequestDto.getRole(),
+                signUpRequestDto.getPower());
         user = userRepository.save(user);
         return user;
 

@@ -50,19 +50,16 @@ public class User extends BaseEntity{
     private String avatar;
 
     @Column(name = "`gender`", columnDefinition = "TINYINT(10)", nullable = true)
-    private int gender;
+    private Integer gender;
 
     @Column(name = "`birthday`", columnDefinition = "DATE", nullable = true)
     private Date birthday;
 
     @Column(name = "`role`", columnDefinition = "TINYINT(10)", nullable = false)
-    private int role;
+    private Integer role;
 
-    @Column(name = "`level`", columnDefinition = "TINYINT(10)", nullable = false)
-    private int level;
-
-    @Column(name = "`usage_time`", columnDefinition = "TINYINT(10)", nullable = false)
-    private int usage_time;
+    @Column(name = "`usage_time`", columnDefinition = "TINYINT(10) DEFAULT 0", nullable = true)
+    private Integer usage_time;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unit_uid")
@@ -73,10 +70,10 @@ public class User extends BaseEntity{
     private Work work;
 
     @Column(name = "`hobby`", columnDefinition = "TEXT", nullable = true)
-    private int hobby;
+    private String hobby;
 
     @Column(name = "`number_employee`", columnDefinition = "INT", nullable = true)
-    private int number_employee;
+    private Integer number_employee;
 
     @ManyToMany
     @JoinTable(name = "user_case_type",
@@ -96,7 +93,7 @@ public class User extends BaseEntity{
             inverseJoinColumns = @JoinColumn(name = "judgment_uid", referencedColumnName = "uid"))
     private Set<Judgment> judgments;
 
-    @Column(name = "`power`", columnDefinition = "TINYINT DEFAULT 2", nullable = false)
+    @Column(name = "`power`", columnDefinition = "TINYINT DEFAULT 4", nullable = false)
     private Integer power;
 
 
@@ -105,7 +102,7 @@ public class User extends BaseEntity{
 
     public User(String uid, int state, String password, String name, LocalDateTime created, LocalDateTime
             modified, String email, String phoneNumber, String description, String avatar, Integer gender,
-                Date birthday, Integer power) {
+                Date birthday, Integer role, Integer power) {
         super();
         this.setUid(uid);
         this.avatar = avatar;
@@ -119,6 +116,7 @@ public class User extends BaseEntity{
         this.description = description;
         this.gender = gender;
         this.birthday = birthday;
+        this.role = role;
         this.power = power;
     }
 

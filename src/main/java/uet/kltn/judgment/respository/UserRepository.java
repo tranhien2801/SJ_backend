@@ -3,6 +3,7 @@ package uet.kltn.judgment.respository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uet.kltn.judgment.model.User;
 
@@ -16,6 +17,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findByEmailInAndState(List<String> emailList, int state);
 
     List<User> findByUidInAndState(List<String> uidList, int state);
+
+    @Query("SELECT u from User u  WHERE u.uid = :id")
+    User findByUid(String id);
 
     User findUserByEmailAndState(String email, int state);
 

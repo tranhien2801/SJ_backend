@@ -37,10 +37,13 @@ public class SignUpRequestDto {
     @JsonAlias({"phoneNumber", "phone_number"})
     private String phoneNumber;
 
-    @Max(4)
-    @Min(4)
+    @NotNull
     @JsonProperty("role")
-    private int role;
+    private Integer role;
+
+    @NotNull
+    @JsonProperty("power")
+    private Integer power;
 
     @JsonProperty("description")
     private String description;

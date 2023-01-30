@@ -1,4 +1,4 @@
-package uet.kltn.judgment.dto.response;
+package uet.kltn.judgment.dto.response.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
