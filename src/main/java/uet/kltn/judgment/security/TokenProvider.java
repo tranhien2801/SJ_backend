@@ -84,13 +84,17 @@ public class TokenProvider {
         userPrincipal.setIsOtp(isOtp);
         User user = userPrincipal.getUser();
         List<GrantedAuthority> authorities = null;
-        if (role == RoleUser.ROLE.getId()) {
+        if (role == RoleUser.ROLE_MANAGER.getId()) {
             authorities = Arrays.stream(RoleUser.values()).map(roleUser -> new SimpleGrantedAuthority(roleUser.name())).collect(Collectors.toList());
 //                    authorities = Collections.singletonList(new SimpleGrantedAuthority(RoleUser.ROLE_BGLOBAL.name()));
-        } else if (role == RoleUser.ROLE_GROUP_ADMIN_OWNER.getId()) {
-            authorities = Collections.singletonList(new SimpleGrantedAuthority(RoleUser.ROLE_GROUP_ADMIN_OWNER.name()));
-        } else {
-            authorities = Collections.singletonList(new SimpleGrantedAuthority(RoleUser.ROLE_CONSUMER.name()));
+        } else if (role == RoleUser.ROLE_STAFF.getId()) {
+            authorities = Collections.singletonList(new SimpleGrantedAuthority(RoleUser.ROLE_STAFF.name()));
+        } else if (role == RoleUser.ROLE_ACCOUNTANT.getId()){
+            authorities = Collections.singletonList(new SimpleGrantedAuthority(RoleUser.ROLE_ACCOUNTANT.name()));
+        } else if (role == RoleUser.ROLE_CONTENT.getId()){
+            authorities = Collections.singletonList(new SimpleGrantedAuthority(RoleUser.ROLE_CONTENT.name()));
+        } else if (role == RoleUser.ROLE_OTHER.getId()){
+            authorities = Collections.singletonList(new SimpleGrantedAuthority(RoleUser.ROLE_OTHER.name()));
         }
         authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
         if (request != null) {

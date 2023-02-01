@@ -33,13 +33,37 @@ public class UserResponseDto {
     private String avatar;
 
     @JsonProperty("gender")
-    private Integer gender;
+    private String gender;
 
     @JsonProperty("birthday")
     private Date birthday;
 
     @JsonProperty("power")
-    private int power;
+    private String power;
+
+    @JsonProperty("state")
+    private String state;
+
+    @JsonProperty("usage_time")
+    private String usageTime;
+
+    @JsonProperty("role")
+    private String role;
+
+    @JsonProperty("unit_name")
+    private String unitName;
+
+    @JsonProperty("work_name")
+    private String workName;
+
+    @JsonProperty("number_staff")
+    private Integer numberStaff;
+
+    @JsonProperty("case_type")
+    private String caseType;
+
+    @JsonProperty("function")
+    private String function;
 
     @JsonProperty("last_login")
     private LocalDateTime lastLogin;

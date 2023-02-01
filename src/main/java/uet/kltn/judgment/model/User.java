@@ -59,7 +59,7 @@ public class User extends BaseEntity{
     private Integer role;
 
     @Column(name = "`usage_time`", columnDefinition = "TINYINT(10) DEFAULT 0", nullable = true)
-    private Integer usage_time;
+    private Integer usageTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unit_uid")
@@ -73,21 +73,21 @@ public class User extends BaseEntity{
     private String hobby;
 
     @Column(name = "`number_employee`", columnDefinition = "INT", nullable = true)
-    private Integer number_employee;
+    private Integer numberEmployee;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_case_type",
                 joinColumns = @JoinColumn(name = "user_uid", referencedColumnName = "uid"),
                 inverseJoinColumns = @JoinColumn(name = "case_type_uid", referencedColumnName = "uid"))
     private Set<CaseType> caseTypes;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_function",
                 joinColumns = @JoinColumn(name = "user_uid", referencedColumnName = "uid"),
                 inverseJoinColumns = @JoinColumn(name = "function_uid", referencedColumnName = "uid"))
     private Set<Function> functions;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "judgment_liked",
             joinColumns = @JoinColumn(name = "user_uid", referencedColumnName = "uid"),
             inverseJoinColumns = @JoinColumn(name = "judgment_uid", referencedColumnName = "uid"))

@@ -9,13 +9,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uet.kltn.judgment.constant.Power;
-import uet.kltn.judgment.constant.State;
+import uet.kltn.judgment.constant.*;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.auth.SignUpRequestDto;
 import uet.kltn.judgment.dto.request.auth.UpdateUserRequestDto;
 import uet.kltn.judgment.dto.response.auth.UserResponseDto;
+import uet.kltn.judgment.model.CaseType;
+import uet.kltn.judgment.model.Function;
 import uet.kltn.judgment.model.User;
 import uet.kltn.judgment.respository.UserRepository;
 import uet.kltn.judgment.util.Utils;
@@ -112,9 +113,17 @@ public class UserService {
                             user.getPhoneNumber(),
                             user.getDescription(),
                             user.getAvatar(),
-                            user.getGender(),
+                            user.getGender() != null ? Gender.getById(user.getGender()).name() : null,
                             user.getBirthday(),
-                            user.getPower(),
+                            Power.getById(user.getPower()).name(),
+                            State.getById(user.getState()).name(),
+                            user.getUsageTime() != null ? UsageTime.getById(user.getUsageTime()).name() : null,
+                            RoleUser.getById(user.getRole()).name(),
+                            user.getUnit() != null ? user.getUnit().getUnitName() : null,
+                            user.getWork() != null ? user.getWork().getWorkName() : null,
+                            0,
+                            user.getCaseTypes().stream().findFirst().orElseThrow().getCaseTypeName(),
+                            user.getFunctions().stream().findFirst().orElseThrow().getFunctionName(),
                             user.getLastLogin()));
         });
 
@@ -130,6 +139,7 @@ public class UserService {
         List<User> users = userPage.getContent();
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
         users.forEach(user -> {
+
             userResponseDtos.add(
                     new UserResponseDto(
                             user.getUid(),
@@ -138,14 +148,48 @@ public class UserService {
                             user.getPhoneNumber(),
                             user.getDescription(),
                             user.getAvatar(),
-                            user.getGender(),
+                            user.getGender() != null ? Gender.getById(user.getGender()).name() : null,
                             user.getBirthday(),
-                            user.getPower(),
+                            Power.getById(user.getPower()).name(),
+                            State.getById(user.getState()).name(),
+                            user.getUsageTime() != null ? UsageTime.getById(user.getUsageTime()).name() : null,
+                            RoleUser.getById(user.getRole()).name(),
+                            user.getUnit() != null ? user.getUnit().getUnitName() : null,
+                            user.getWork() != null ? user.getWork().getWorkName() : null,
+                            0,
+                            user.getCaseTypes().size() != 0 ? user.getCaseTypes().stream().findFirst().orElseThrow().getCaseTypeName() : null,
+                            user.getFunctions().size() != 0 ? user.getFunctions().stream().findFirst().orElseThrow().getFunctionName() : null,
                             user.getLastLogin()));
         });
 
         return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
     }
+
+//    public PageDto getUsersByFilter(ExpressionDto expressionDto, int role) {
+//        List<Integer> roleList = new ArrayList<>();
+//        for (int i = role; i <= 4 ; i++) {
+//            roleList.add(i);
+//        }
+//        Page<User> userPage = userRepository.findUsersByStateAndPowerIn(expressionDto.getPageable(), State.ACTIVE.getId(), roleList);
+//        List<User> users = userPage.getContent();
+//        List<UserResponseDto> userResponseDtos = new ArrayList<>();
+//        users.forEach(user -> {
+//            userResponseDtos.add(
+//                    new UserResponseDto(
+//                            user.getUid(),
+//                            user.getName(),
+//                            user.getEmail(),
+//                            user.getPhoneNumber(),
+//                            user.getDescription(),
+//                            user.getAvatar(),
+//                            user.getGender(),
+//                            user.getBirthday(),
+//                            user.getPower(),
+//                            user.getLastLogin()));
+//        });
+//
+//        return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
+//    }
 
     public void deleteListUser(List<User> users) {
         users.forEach(user -> {
