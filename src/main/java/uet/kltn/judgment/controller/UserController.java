@@ -77,7 +77,7 @@ public class UserController extends GenController {
                 return responseUtil.getNotFoundResponse(id);
             }
 
-            if ((user.getPower() < Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId())){
+            if ((user.getPower() < Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId())) {
                 return responseUtil.getForbiddenResponse();
             }
 
@@ -135,7 +135,7 @@ public class UserController extends GenController {
                 return responseUtil.getNotFoundResponse(id);
             }
 
-            if ((user.getPower() < Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId())){
+            if ((user.getPower() < Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId())) {
                 return responseUtil.getForbiddenResponse();
             }
             user = userService.resetPassword(resetPasswordRequestDto.getPassword(), user);
@@ -160,13 +160,36 @@ public class UserController extends GenController {
             ExpressionDto expressionDto = (ExpressionDto) params.get("expression");
             if ((userPrincipal.getAuthorities().contains(Power.STAFF.getAuthority()))) {
                 response = userService.getCurrentUser(expressionDto, userPrincipal.getUser().getUid());
-            } else response = userService.getAllUser(expressionDto, Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId());
+            } else
+                response = userService.getAllUser(expressionDto, Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId());
 
             return responseUtil.getSuccessResponse(response);
         } catch (Exception e) {
             e.printStackTrace();
             return responseUtil.getInternalServerErrorResponse();
         }
+    }
+
+    @GetMapping(path = "/managers")
+    public ResponseEntity<?> getListManager(@CurrentUser UserPrincipal userPrincipal,
+                                            Authentication authentication,
+                                            @RequestParam Map<String, Object> request) {
+        try {
+            if (userPrincipal == null
+                    || userPrincipal.getAuthorities().contains(Power.STAFF.getAuthority())
+                    || userPrincipal.getAuthorities().contains(Power.MANAGER.getAuthority())) {
+                return responseUtil.getForbiddenResponse();
+            }
+            PageDto response = new PageDto();
+            Map<String, Object> params = utils.getExpressionAndParams(request, User.class);
+            ExpressionDto expressionDto = (ExpressionDto) params.get("expression");
+            response = userService.getUserIsEnterpriseManagement(expressionDto);
+            return responseUtil.getSuccessResponse(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+
     }
 
     @DeleteMapping()
@@ -181,7 +204,7 @@ public class UserController extends GenController {
             int powerCurrentUser = Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId();
 
             List<User> users = userService.getUserByIdsAndPowerGreater(uids, powerCurrentUser);
-            if(users.size() != uids.size()) {
+            if (users.size() != uids.size()) {
                 return responseUtil.getBadRequestResponse("Not found all uids or your role is lower than some uids");
             }
 

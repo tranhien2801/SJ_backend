@@ -139,7 +139,6 @@ public class UserService {
         List<User> users = userPage.getContent();
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
         users.forEach(user -> {
-
             userResponseDtos.add(
                     new UserResponseDto(
                             user.getUid(),
@@ -162,6 +161,35 @@ public class UserService {
                             user.getLastLogin()));
         });
 
+        return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
+    }
+
+    public PageDto getUserIsEnterpriseManagement(ExpressionDto expressionDto) {
+        Page<User> userPage = userRepository.findByLevelAndRoleAndState(expressionDto.getPageable(), Level.LEVEL_ENTERPRISE.getId(), RoleUser.ROLE_MANAGER.getId(), State.ACTIVE.getId());
+        List<User> users = userPage.getContent();
+        List<UserResponseDto> userResponseDtos = new ArrayList<>();
+        users.forEach(user -> {
+            userResponseDtos.add(
+                    new UserResponseDto(
+                            user.getUid(),
+                            user.getName(),
+                            user.getEmail(),
+                            user.getPhoneNumber(),
+                            user.getDescription(),
+                            user.getAvatar(),
+                            user.getGender() != null ? Gender.getById(user.getGender()).name() : null,
+                            user.getBirthday(),
+                            Power.getById(user.getPower()).name(),
+                            State.getById(user.getState()).name(),
+                            user.getUsageTime() != null ? UsageTime.getById(user.getUsageTime()).name() : null,
+                            RoleUser.getById(user.getRole()).name(),
+                            user.getUnit() != null ? user.getUnit().getUnitName() : null,
+                            user.getWork() != null ? user.getWork().getWorkName() : null,
+                            0,
+                            user.getCaseTypes().size() != 0 ? user.getCaseTypes().stream().findFirst().orElseThrow().getCaseTypeName() : null,
+                            user.getFunctions().size() != 0 ? user.getFunctions().stream().findFirst().orElseThrow().getFunctionName() : null,
+                            user.getLastLogin()));
+        });
         return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
     }
 

@@ -96,6 +96,9 @@ public class User extends BaseEntity{
     @Column(name = "`power`", columnDefinition = "TINYINT DEFAULT 4", nullable = false)
     private Integer power;
 
+    @Column(name = "`level`", columnDefinition = "TINYINT", nullable = true)
+    private Integer level;
+
 
     @Column(name = "`last_login`", columnDefinition = "BIGINT")
     private LocalDateTime lastLogin;

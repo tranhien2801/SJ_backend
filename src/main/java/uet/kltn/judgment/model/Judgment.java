@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
+import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
 
 import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -77,4 +79,24 @@ public class Judgment extends BaseEntity {
         @ManyToMany(mappedBy = "judgments")
         @JsonIgnore
         private Set<User> users;
+
+        public void update(UpdateJudgmentRequestDto updateJudgmentRequestDto) {
+                this.setModified(LocalDateTime.now());
+                if (updateJudgmentRequestDto.getJudgmentNumber() != null)
+                        this.judgmentNumber = updateJudgmentRequestDto.getJudgmentNumber();
+                if (updateJudgmentRequestDto.getJudgmentName() != null)
+                        this.judgmentName = updateJudgmentRequestDto.getJudgmentName();
+                if (updateJudgmentRequestDto.getJudgmentContent() != null)
+                        this.judgmentContent = updateJudgmentRequestDto.getJudgmentContent();
+                if (updateJudgmentRequestDto.getJudgmentText() != null)
+                        this.judgmentText = updateJudgmentRequestDto.getJudgmentText();
+                if (updateJudgmentRequestDto.getUrl() != null)
+                        this.url = updateJudgmentRequestDto.getUrl();
+                if (updateJudgmentRequestDto.getFileDownload() != null)
+                        this.fileDownload = updateJudgmentRequestDto.getFileDownload();
+                if (updateJudgmentRequestDto.getCountEyes() != null)
+                        this.countEyes = updateJudgmentRequestDto.getCountEyes();
+                if (updateJudgmentRequestDto.getCountDownload() != null)
+                        this.countDownload = updateJudgmentRequestDto.getCountDownload();
+        }
 }

@@ -10,7 +10,7 @@ import uet.kltn.judgment.model.User;
 import java.util.List;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, String> {
 
     List<User> findByUidIn(List<String> uidList);
 
@@ -34,4 +34,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Page<User> findByUidAndState(Pageable pageable, String uid, int state);
 
     Page<User> findAllByStateAndPowerIn(Pageable pageable, int state, List<Integer> listPower);
+
+    Page<User> findByLevelAndRoleAndState(Pageable pageable, int level, int role, int state);
 }
