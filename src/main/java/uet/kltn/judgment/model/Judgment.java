@@ -56,6 +56,9 @@ public class Judgment extends BaseEntity {
         @Column(name = "`file_download`", columnDefinition = "VARCHAR(5000)", nullable = false)
         private String fileDownload;
 
+        @Column(name = "`pdf_viewer`", columnDefinition = "VARCHAR(5000)", nullable = false)
+        private String pdfViewer;
+
         @Column(name = "`corrections`", columnDefinition = "INT", nullable = false)
         private int corrections;
 

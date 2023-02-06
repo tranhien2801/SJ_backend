@@ -52,6 +52,9 @@ public class JudgmentResponseDto {
     @JsonProperty("file_download")
     private String fileDownload;
 
+    @JsonProperty("pdf_viewer")
+    private String pdfViewer;
+
     @JsonProperty("count_vote")
     private Integer countVote;
 

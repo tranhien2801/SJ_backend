@@ -62,6 +62,7 @@ public class JudgmentService {
                             judgment.getDateUpload(),
                             judgment.getUrl(),
                             judgment.getFileDownload(),
+                            judgment.getPdfViewer(),
                             judgment.getCountVote(),
                             judgment.getCountEyes(),
                             judgment.getCountDownload()));
