@@ -10,6 +10,7 @@ import uet.kltn.judgment.constant.Power;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
+import uet.kltn.judgment.dto.response.judgment.JudgmentResponseDto;
 import uet.kltn.judgment.model.Judgment;
 import uet.kltn.judgment.security.CurrentUser;
 import uet.kltn.judgment.security.UserPrincipal;
@@ -39,7 +40,7 @@ public class JudgmentController extends GenController {
             if (userPrincipal == null) {
                 return responseUtil.getForbiddenResponse();
             }
-            Judgment judgment = judgmentService.getJudgmentByUid(uid);
+            JudgmentResponseDto judgment = judgmentService.getJudgmentResponseDtoByUid(uid);
             if (judgment == null) {
                 return responseUtil.getNotFoundResponse(uid);
             }

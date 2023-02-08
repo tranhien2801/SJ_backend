@@ -38,6 +38,28 @@ public class JudgmentService {
         return judgmentRepository.findByUid(uid);
     }
 
+    public JudgmentResponseDto getJudgmentResponseDtoByUid(String uid) {
+        Judgment judgment =  judgmentRepository.findByUid(uid);
+        return new JudgmentResponseDto(
+                judgment.getUid(),
+                judgment.getJudgmentNumber(),
+                judgment.getJudgmentName(),
+                judgment.getTypeDocument(),
+                judgment.getJudgmentLevel(),
+                judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
+                judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
+                judgment.getJudgmentContent(),
+                judgment.getJudgmentText(),
+                judgment.getDateIssued(),
+                judgment.getDateUpload(),
+                judgment.getUrl(),
+                judgment.getFileDownload(),
+                judgment.getPdfViewer(),
+                judgment.getCountVote(),
+                judgment.getCountEyes(),
+                judgment.getCountDownload());
+    }
+
     public List<Judgment> getJudgmentByUids(List<String> uids) {
         return judgmentRepository.findByUidInAndState(uids, State.ACTIVE.getId());
     }
