@@ -39,6 +39,7 @@ public class JudgmentService {
     }
 
     public JudgmentResponseDto getJudgmentResponseDtoByUid(String uid) {
+        if (uid == null) return null;
         Judgment judgment =  judgmentRepository.findByUid(uid);
         return new JudgmentResponseDto(
                 judgment.getUid(),

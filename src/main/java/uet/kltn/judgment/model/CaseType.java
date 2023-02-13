@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -25,4 +26,11 @@ public class CaseType extends BaseEntity {
     @ManyToMany(mappedBy = "caseTypes")
     @JsonIgnore
     private Set<User> users;
+
+    public CaseType(String uid, String caseTypeName) {
+        super();
+        this.setUid(uid);
+        this.setCreated(LocalDateTime.now());
+        this.caseTypeName = caseTypeName;
+    }
 }

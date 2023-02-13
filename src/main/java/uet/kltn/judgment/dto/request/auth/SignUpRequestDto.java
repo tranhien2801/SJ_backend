@@ -8,8 +8,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uet.kltn.judgment.constant.Constant;
 import uet.kltn.judgment.constant.DtoField;
+import uet.kltn.judgment.model.Function;
 
 import javax.validation.constraints.*;
+import java.util.List;
+import java.util.Set;
 
 
 @Getter
@@ -33,15 +36,38 @@ public class SignUpRequestDto {
     @JsonAlias("password")
     private String password;
 
+    @JsonProperty("level")
+    private Integer level;
+
+    @JsonProperty("state")
+    private Integer state;
+
+    @JsonProperty("usage_time")
+    private Integer usageTime;
+
+    @JsonProperty("functions")
+    private Set<String> functions;
+
+    @JsonProperty("case_types")
+    private Set<String> caseTypes;
+
     @Size(max = 16, message = "phone_number must be greater than 8")
     @JsonAlias({"phoneNumber", "phone_number"})
     private String phoneNumber;
+
+    @JsonProperty("unit")
+    private String unit;
 
     @NotNull
     @JsonProperty("role")
     private Integer role;
 
-    @NotNull
+    @JsonProperty("work")
+    private String work;
+
+    @JsonProperty("number_employee")
+    private Integer numberEmployee;
+
     @JsonProperty("power")
     private Integer power;
 

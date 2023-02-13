@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uet.kltn.judgment.constant.Constant;
 import uet.kltn.judgment.constant.DtoField;
 import uet.kltn.judgment.constant.Power;
@@ -29,7 +26,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController extends GenController{
+public class AuthController extends GenController {
     @Autowired
     private UserService userService;
     @Autowired
@@ -72,10 +69,10 @@ public class AuthController extends GenController{
             userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority();
             String email = signUpRequestDto.getEmail();
             String phoneNumber = signUpRequestDto.getPhoneNumber();
-            int role = signUpRequestDto.getRole();
-            if (role < Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId()) {
-                return responseUtil.getForbiddenResponse();
-            }
+//            int role = signUpRequestDto.getRole();
+//            if (role < Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId()) {
+//                return responseUtil.getForbiddenResponse();
+//            }
             if ((email == null || email.isBlank()) && (phoneNumber == null || phoneNumber.isBlank())) {
                 Map<String, List<String>> errorMap = new HashMap<>();
                 List<String> error = new ArrayList<>();
@@ -98,6 +95,13 @@ public class AuthController extends GenController{
                 error.add(String.format(Constant.FORMAT_EXIST, DtoField.PARAM_EMAIL));
                 errorMap.put(DtoField.PARAM_EMAIL, error);
                 return responseUtil.getBadRequestResponse(errorMap);
+            }
+
+            if (Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId() == Power.ADMIN.getId()
+                    || Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId() == Power.SYSTEM_ADMIN.getId()) {
+                signUpRequestDto.setPower(Power.MANAGER.getId());
+            } else if (Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId() == Power.MANAGER.getId()) {
+                signUpRequestDto.setPower(Power.STAFF.getId());
             }
 
             User user = userService.createNewUser(signUpRequestDto, isEmailUsername);

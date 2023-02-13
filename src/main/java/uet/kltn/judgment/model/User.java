@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
+import uet.kltn.judgment.constant.UsageTime;
 import uet.kltn.judgment.dto.request.auth.SignUpRequestDto;
 import uet.kltn.judgment.dto.request.auth.UpdateUserRequestDto;
 import uet.kltn.judgment.util.Utils;
@@ -14,6 +15,7 @@ import uet.kltn.judgment.util.Utils;
 import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -102,6 +104,31 @@ public class User extends BaseEntity{
 
     @Column(name = "`last_login`", columnDefinition = "BIGINT")
     private LocalDateTime lastLogin;
+
+    public User(String uid, String password, SignUpRequestDto signUpRequestDto) {
+        super();
+        this.setUid(uid);
+        if (signUpRequestDto.getState() != null)
+            this.setState(signUpRequestDto.getState());
+        this.setCreated(LocalDateTime.now());
+        this.password = password;
+        this.name = signUpRequestDto.getName();
+        this.email = signUpRequestDto.getEmail();
+        if (signUpRequestDto.getLevel() != null)
+            this.level = signUpRequestDto.getLevel();
+        if (signUpRequestDto.getUsageTime() != null)
+            this.usageTime = signUpRequestDto.getUsageTime();
+        else
+            this.usageTime = UsageTime.SEVEN_DAYS_TRIAL.getId();
+        if (signUpRequestDto.getPhoneNumber() != null)
+            this.phoneNumber = signUpRequestDto.getPhoneNumber();
+        this.role = signUpRequestDto.getRole();
+        if (signUpRequestDto.getNumberEmployee() != null)
+            this.numberEmployee = signUpRequestDto.getNumberEmployee();
+        this.power = signUpRequestDto.getPower();
+        if (signUpRequestDto.getDescription() != null)
+            this.description = signUpRequestDto.getDescription();
+    }
 
     public User(String uid, int state, String password, String name, LocalDateTime created, LocalDateTime
             modified, String email, String phoneNumber, String description, String avatar, Integer gender,

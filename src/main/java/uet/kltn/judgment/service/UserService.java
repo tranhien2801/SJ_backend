@@ -15,15 +15,14 @@ import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.auth.SignUpRequestDto;
 import uet.kltn.judgment.dto.request.auth.UpdateUserRequestDto;
 import uet.kltn.judgment.dto.response.auth.UserResponseDto;
-import uet.kltn.judgment.model.CaseType;
-import uet.kltn.judgment.model.Function;
-import uet.kltn.judgment.model.User;
-import uet.kltn.judgment.respository.UserRepository;
+import uet.kltn.judgment.model.*;
+import uet.kltn.judgment.respository.*;
 import uet.kltn.judgment.util.Utils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -35,26 +34,47 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private FunctionRepository functionRespository;
+
+    @Autowired
+    private CaseTypeRepository caseTypeRespository;
+
+    @Autowired
+    private WorkRepository workRespository;
+
+    @Autowired
+    private UnitRepository unitRespository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Transactional
     public User createNewUser(SignUpRequestDto signUpRequestDto, boolean isEmailUsername) {
         // Creating user's account
-        User user = new User(
-                Utils.uuid(),
-                State.ACTIVE.getId(),
-                passwordEncoder.encode(signUpRequestDto.getPassword()),
-                signUpRequestDto.getName(),
-                LocalDateTime.now(),
-                null,
-                signUpRequestDto.getEmail(),
-                signUpRequestDto.getPhoneNumber(),
-                signUpRequestDto.getDescription(),
-                null,
-                null,
-                null,
-                signUpRequestDto.getRole(),
-                signUpRequestDto.getPower());
+        User user = new User(Utils.uuid(),
+                            passwordEncoder.encode(signUpRequestDto.getPassword()),
+                            signUpRequestDto);
+        if (signUpRequestDto.getFunctions() != null) {
+            Set<Function> functions = functionRespository.findByFunctionNameInAndState(signUpRequestDto.getFunctions(), State.ACTIVE.getId());
+            user.setFunctions(functions);
+        }
+
+        if (signUpRequestDto.getCaseTypes() != null) {
+            Set<CaseType> caseTypes = caseTypeRespository.findByCaseTypeNameInAndState(signUpRequestDto.getCaseTypes(), State.ACTIVE.getId());
+            user.setCaseTypes(caseTypes);
+        }
+
+        if (signUpRequestDto.getWork() != null) {
+            Work work = workRespository.findByWorkNameAndState(signUpRequestDto.getWork(), State.ACTIVE.getId());
+            if (work == null) work = new Work(Utils.uuid(), signUpRequestDto.getWork());
+            workRespository.save(work);
+            user.setWork(work);
+        }
+
+        if (signUpRequestDto.getUnit() != null) {
+            Unit unit = unitRespository.findByUnitNameAndState(signUpRequestDto.getUnit(), State.ACTIVE.getId());
+            user.setUnit(unit);
+        }
         user = userRepository.save(user);
         return user;
 
@@ -132,7 +152,7 @@ public class UserService {
 
     public PageDto getAllUser(ExpressionDto expressionDto, int role) {
         List<Integer> roleList = new ArrayList<>();
-        for (int i = role; i <= 4 ; i++) {
+        for (int i = role; i <= 4; i++) {
             roleList.add(i);
         }
         Page<User> userPage = userRepository.findAllByStateAndPowerIn(expressionDto.getPageable(), State.ACTIVE.getId(), roleList);
