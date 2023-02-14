@@ -39,8 +39,18 @@ public class AuthController extends GenController {
     public ResponseEntity<ResponseDto> login(@RequestBody AuthDto authDto) {
         try {
             User user = userService.getUserByUsername(authDto.getUsername());
-            if (user == null || !BCrypt.checkpw(authDto.getPassword(), user.getPassword())) {
-                return responseUtil.getUnauthorizedResponse();
+            if (user == null) {
+                Map<String, List<String>> errorMap = new HashMap<>();
+                List<String> error = new ArrayList<>();
+                error.add("Username không tồn tại trong hệ thống");
+                errorMap.put(DtoField.PARAM_EMAIL, error);
+                return responseUtil.getUnauthorizedResponse(errorMap);
+            } else if (!BCrypt.checkpw(authDto.getPassword(), user.getPassword())) {
+                Map<String, List<String>> errorMap = new HashMap<>();
+                List<String> error = new ArrayList<>();
+                error.add("Password không đúng");
+                errorMap.put(DtoField.PARAM_PASSWORD, error);
+                return responseUtil.getUnauthorizedResponse(errorMap);
             } else {
                 String token = tokenProvider.createToken(user, user.getPower());
                 return responseUtil.getSuccessResponse(new AuthResponseDto(token,

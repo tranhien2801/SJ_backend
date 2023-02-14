@@ -30,48 +30,48 @@ public class SignUpRequestDto {
     @JsonAlias("email")
     private String email;
 
-    @NotBlank @NotNull
-    @Size(min = Constant.VALUE_DEFAULT_PASSWORD_SIZE, message = Constant.MSG_SIZE_GREATER + Constant.VALUE_DEFAULT_PASSWORD_SIZE)
-    @Pattern(regexp = Constant.PATTERN_EXC_WHITE_SPACE, message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_INCLUDE_WHITE_SPACE)
+    @NotBlank @NotNull(message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_NOT_BLANK)
+    @Size(min = Constant.VALUE_DEFAULT_PASSWORD_SIZE, message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_SIZE_GREATER + Constant.VALUE_DEFAULT_PASSWORD_SIZE)
+    @Pattern(regexp = Constant.PATTERN_EXC_WHITE_SPACE, message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_NOT_INCLUDE_WHITE_SPACE)
     @JsonAlias("password")
     private String password;
 
-    @JsonProperty("level")
+    @JsonAlias("level")
     private Integer level;
 
-    @JsonProperty("state")
+    @JsonAlias("state")
     private Integer state;
 
-    @JsonProperty("usage_time")
+    @JsonAlias("usage_time")
     private Integer usageTime;
 
-    @JsonProperty("functions")
+    @JsonAlias("functions")
     private Set<String> functions;
 
-    @JsonProperty("case_types")
+    @JsonAlias("case_types")
     private Set<String> caseTypes;
 
-    @Size(max = 16, message = "phone_number must be greater than 8")
+    @Size(max = 16, message = "phone_number phải có độ dài lớn hơn 8")
     @JsonAlias({"phoneNumber", "phone_number"})
     private String phoneNumber;
 
-    @JsonProperty("unit")
+    @JsonAlias("unit")
     private String unit;
 
     @NotNull
-    @JsonProperty("role")
+    @JsonAlias("role")
     private Integer role;
 
-    @JsonProperty("work")
+    @JsonAlias("work")
     private String work;
 
-    @JsonProperty("number_employee")
+    @JsonAlias("number_employee")
     private Integer numberEmployee;
 
-    @JsonProperty("power")
+    @JsonAlias("power")
     private Integer power;
 
-    @JsonProperty("description")
+    @JsonAlias("description")
     private String description;
 
 }

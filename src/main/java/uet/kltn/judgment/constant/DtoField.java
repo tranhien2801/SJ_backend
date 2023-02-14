@@ -29,7 +29,7 @@ public class DtoField {
     public static final String PAGE_DTO_TOTAL = "total";
 
     //PasswordDto
-    public static final String PASSWORD_DTO_PASSWORD = "password";
+    public static final String PASSWORD_DTO_PASSWORD = "password ";
     public static final String PASSWORD_DTO_CONFIRM_PASSWORD = "confirm_password";
     public static final String PASSWORD_DTO_NEW_PASSWORD = "new_password";
 

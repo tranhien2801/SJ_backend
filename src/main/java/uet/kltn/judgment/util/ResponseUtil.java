@@ -72,8 +72,8 @@ public class ResponseUtil {
                 HttpStatus.UNAUTHORIZED.value()), HttpStatus.UNAUTHORIZED);
     }
 
-    public ResponseEntity<ResponseDto> getUnauthorizedResponse(String message) {
-        return new ResponseEntity<>(new ResponseDto(message, HttpStatus.UNAUTHORIZED.value()), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ResponseDto> getUnauthorizedResponse(Map<String, List<String>> error) {
+        return new ResponseEntity<>(new ResponseDto(error, HttpStatus.UNAUTHORIZED.getReasonPhrase(), HttpStatus.UNAUTHORIZED.value()), HttpStatus.UNAUTHORIZED);
     }
 
     public ResponseEntity<ResponseDto> getForbiddenResponse() {

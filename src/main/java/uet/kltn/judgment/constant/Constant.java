@@ -115,7 +115,7 @@ public final class Constant {
     //STRING FORMAT
     public static final String FORMAT_2_DIGIT_NUMERIC = "%02d";
     public static final String FORMAT_NOT_FOUND = "%s NOT FOUND";
-    public static final String FORMAT_EXIST = "%s exist";
+    public static final String FORMAT_EXIST = "%s đã tồn tại";
     public static final String FORMAT_RESERVATION_CODE_PERIODIC = "%s-" + FORMAT_2_DIGIT_NUMERIC + "-" + FORMAT_2_DIGIT_NUMERIC;
     public static final String FORMAT_RESERVATION_CODE = "%s-" + FORMAT_2_DIGIT_NUMERIC;
     public static final String FORMAT_REMOTE_ORDER_CODE = "%s-%s";
@@ -133,8 +133,11 @@ public final class Constant {
             "|^(\\+\\d{1,3}( )?)?(\\d{3}[ ]?){2}\\d{3}$|^(\\+\\d{1,3}( )?)?(\\d{3}[ ]?)(\\d{2}[ ]?){2}\\d{2}$";
 
     //MSG
-    public static final String MSG_INCLUDE_WHITE_SPACE = " include white space";
-    public static final String MSG_SIZE_GREATER = "size must be greater than ";
+    public static final String MSG_INCLUDE_WHITE_SPACE = "bao gồm khoảng trắng ";
+    public static final String MSG_NOT_INCLUDE_WHITE_SPACE = "không bao gồm khoảng trắng ";
+    public static final String MSG_NOT_BLANK = "không được để trống";
+
+    public static final String MSG_SIZE_GREATER = "phải có kích thước lớn hơn ";
     public static final String MSG_INVITATION_CONSUMER = "Xin chào %s, bạn vừa được %s gửi 1 lời mời trở thành khách hàng của nhà hàng %s. \n" +
             "Hãy bắt đầu tham gia bằng cách chấp nhận lời mời bên dưới.\n" +
             "%s";
