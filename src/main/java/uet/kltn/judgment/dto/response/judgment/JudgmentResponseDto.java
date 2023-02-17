@@ -34,6 +34,9 @@ public class JudgmentResponseDto {
     @JsonProperty("case_name")
     private String caseName;
 
+    @JsonProperty("case_type")
+    private String caseType;
+
     @JsonProperty("judgment_content")
     private String judgmentContent;
 

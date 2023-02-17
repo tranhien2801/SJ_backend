@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import uet.kltn.judgment.constant.Power;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
+import uet.kltn.judgment.dto.request.judgment.FilterJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
 import uet.kltn.judgment.dto.response.judgment.JudgmentResponseDto;
 import uet.kltn.judgment.model.Judgment;
@@ -20,6 +21,7 @@ import uet.kltn.judgment.service.UserService;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,10 +53,11 @@ public class JudgmentController extends GenController {
         }
     }
 
-    @GetMapping("/list")
+    @PostMapping("/list")
     public ResponseEntity<?> getJudgmentsList(@CurrentUser UserPrincipal userPrincipal,
                                               Authentication authentication,
-                                              @RequestParam Map<String, Object> request) {
+                                              @RequestParam Map<String, Object> request,
+                                              @RequestBody(required = false) FilterJudgmentRequestDto filterJudgmentRequestDto) {
         try {
             if (userPrincipal == null) {
                 return responseUtil.getForbiddenResponse();
@@ -62,8 +65,18 @@ public class JudgmentController extends GenController {
             PageDto response = new PageDto();
             Map<String, Object> params = utils.getExpressionAndParams(request, Judgment.class);
             ExpressionDto expressionDto = (ExpressionDto) params.get("expression");
-            response = judgmentService.getAllJudgments(expressionDto);
+            response = judgmentService.getJudgmentsByFilter(expressionDto, filterJudgmentRequestDto);
+            return responseUtil.getSuccessResponse(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
 
+    @GetMapping("/judgment-level")
+    public ResponseEntity<?> getCourtLevels(Authentication authentication) {
+        try {
+            Set<String> response = judgmentService.getJudgmentLevels();
             return responseUtil.getSuccessResponse(response);
         } catch (Exception e) {
             e.printStackTrace();

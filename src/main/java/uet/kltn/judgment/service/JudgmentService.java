@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import uet.kltn.judgment.constant.State;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
+import uet.kltn.judgment.dto.request.judgment.FilterJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
 import uet.kltn.judgment.dto.response.judgment.JudgmentResponseDto;
 import uet.kltn.judgment.model.Judgment;
@@ -18,6 +19,7 @@ import uet.kltn.judgment.respository.JudgmentRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -49,6 +51,7 @@ public class JudgmentService {
                 judgment.getJudgmentLevel(),
                 judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
                 judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
+                judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
                 judgment.getJudgmentContent(),
                 judgment.getJudgmentText(),
                 judgment.getDateIssued(),
@@ -65,8 +68,20 @@ public class JudgmentService {
         return judgmentRepository.findByUidInAndState(uids, State.ACTIVE.getId());
     }
 
-    public PageDto getAllJudgments(ExpressionDto expressionDto) {
-        Page<Judgment> judgmentPage = judgmentRepository.findAllByState(expressionDto.getPageable(), State.ACTIVE.getId());
+    public PageDto getJudgmentsByFilter(ExpressionDto expressionDto, FilterJudgmentRequestDto filterJudgmentRequestDto) {
+        Page<Judgment> judgmentPage;
+        if (filterJudgmentRequestDto == null || filterJudgmentRequestDto.isEmpty()) {
+            judgmentPage = judgmentRepository.findAllByState(expressionDto.getPageable(), State.ACTIVE.getId());
+        } else {
+            judgmentPage = judgmentRepository.findByFilterAndState(
+                    expressionDto.getPageable(),
+                    filterJudgmentRequestDto.getJudgmentNumber() != null ? filterJudgmentRequestDto.getJudgmentNumber() : "",
+                    filterJudgmentRequestDto.getCourtLevel() != null ? filterJudgmentRequestDto.getCourtLevel() : "",
+                    filterJudgmentRequestDto.getJudgmentLevel() != null ? filterJudgmentRequestDto.getJudgmentLevel() : "",
+                    filterJudgmentRequestDto.getTypeDocument() != null ? filterJudgmentRequestDto.getTypeDocument() : "",
+                    filterJudgmentRequestDto.getCaseType() != null ? filterJudgmentRequestDto.getCaseType() : "",
+                    State.ACTIVE.getId());
+        }
         List<Judgment> judgments = judgmentPage.getContent();
         List<JudgmentResponseDto> judgmentResponseDtos = new ArrayList<>();
         judgments.forEach(judgment -> {
@@ -79,6 +94,7 @@ public class JudgmentService {
                             judgment.getJudgmentLevel(),
                             judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
                             judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
+                            judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
                             judgment.getJudgmentContent(),
                             judgment.getJudgmentText(),
                             judgment.getDateIssued(),
@@ -99,5 +115,9 @@ public class JudgmentService {
             judgment.setModified(LocalDateTime.now());
         });
         judgmentRepository.saveAll(judgments);
+    }
+
+    public Set<String> getJudgmentLevels() {
+        return judgmentRepository.findJudgmentLevels();
     }
 }
