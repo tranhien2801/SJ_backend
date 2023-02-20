@@ -137,6 +137,9 @@ public final class Constant {
     public static final String MSG_NOT_INCLUDE_WHITE_SPACE = "không bao gồm khoảng trắng ";
     public static final String MSG_NOT_BLANK = "không được để trống";
 
+    public static final String MSG_NOT_NULL = "không được để null";
+
+
     public static final String MSG_SIZE_GREATER = "phải có kích thước lớn hơn ";
     public static final String MSG_INVITATION_CONSUMER = "Xin chào %s, bạn vừa được %s gửi 1 lời mời trở thành khách hàng của nhà hàng %s. \n" +
             "Hãy bắt đầu tham gia bằng cách chấp nhận lời mời bên dưới.\n" +

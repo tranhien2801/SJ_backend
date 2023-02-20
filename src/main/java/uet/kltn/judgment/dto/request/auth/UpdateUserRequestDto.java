@@ -30,8 +30,6 @@ public class UpdateUserRequestDto {
     @JsonProperty("description")
     private String description;
 
-    @Max(4)
-    @Min(3)
     @JsonProperty("role")
     private int role;
 

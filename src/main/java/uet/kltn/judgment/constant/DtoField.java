@@ -29,9 +29,9 @@ public class DtoField {
     public static final String PAGE_DTO_TOTAL = "total";
 
     //PasswordDto
-    public static final String PASSWORD_DTO_PASSWORD = "password ";
-    public static final String PASSWORD_DTO_CONFIRM_PASSWORD = "confirm_password";
-    public static final String PASSWORD_DTO_NEW_PASSWORD = "new_password";
+    public static final String PASSWORD_DTO_PASSWORD = "Mật khẩu ";
+    public static final String PASSWORD_DTO_CONFIRM_PASSWORD = "Mật khẩu xác nhận ";
+    public static final String PASSWORD_DTO_NEW_PASSWORD = "Mật khẩu mới ";
 
     //WorkingShiftDto
     public static final String WORKING_SHIFT ="working shift";

@@ -45,13 +45,21 @@ public class UserController extends GenController {
 
             User currentUser = userPrincipal.getUser();
             if (!BCrypt.checkpw(changePasswordRequestDto.getCurrentPassword(), currentUser.getPassword())) {
-                return responseUtil.getUnauthorizedResponse();
+                Map<String, List<String>> errorMap = new HashMap<>();
+                List<String> error = new ArrayList<>();
+                error.add("Mật khẩu hiện tại không đúng");
+                errorMap.put(DtoField.PARAM_PASSWORD, error);
+                return responseUtil.getUnauthorizedResponse(errorMap);
             }
 
             String newPassword = changePasswordRequestDto.getNewPassword();
             String reNewPassword = changePasswordRequestDto.getReNewPassword();
             if (!newPassword.equals(reNewPassword)) {
-                return responseUtil.getBadRequestResponse("New password and re-new password is not same");
+                Map<String, List<String>> errorMap = new HashMap<>();
+                List<String> error = new ArrayList<>();
+                error.add("Mật khẩu mới và mật khẩu xác nhận không trùng khớp");
+                errorMap.put(DtoField.PARAM_PASSWORD, error);
+                return responseUtil.getBadRequestResponse(errorMap);
             }
 
             userService.resetPassword(newPassword, userPrincipal.getUser());
@@ -185,6 +193,28 @@ public class UserController extends GenController {
             ExpressionDto expressionDto = (ExpressionDto) params.get("expression");
             response = userService.getUserIsEnterpriseManagement(expressionDto);
             return responseUtil.getSuccessResponse(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUser(@PathVariable(value = "id") String id,
+                                           @CurrentUser UserPrincipal userPrincipal,
+                                           Authentication authentication) {
+        try {
+            if (userPrincipal == null ) {
+                return responseUtil.getForbiddenResponse();
+            }
+
+            User user = userService.getUserById(id);
+            if (user == null) {
+                return responseUtil.getNotFoundResponse(id);
+            }
+
+            return responseUtil.getSuccessResponse(user);
         } catch (Exception e) {
             e.printStackTrace();
             return responseUtil.getInternalServerErrorResponse();

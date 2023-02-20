@@ -18,24 +18,24 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangePasswordRequestDto {
-    @NotBlank
-    @NotNull
-    @Size(min = Constant.VALUE_DEFAULT_PASSWORD_SIZE, message = Constant.MSG_SIZE_GREATER + Constant.VALUE_DEFAULT_PASSWORD_SIZE)
+    @NotBlank(message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_NOT_BLANK)
+    @NotNull(message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_NOT_NULL)
+    @Size(min = Constant.VALUE_DEFAULT_PASSWORD_SIZE, message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_SIZE_GREATER + Constant.VALUE_DEFAULT_PASSWORD_SIZE)
     @Pattern(regexp = Constant.PATTERN_EXC_WHITE_SPACE, message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_INCLUDE_WHITE_SPACE)
     @JsonAlias({"currentPassword", "current_password"})
     private String currentPassword;
 
-    @NotBlank
-    @NotNull
-    @Size(min = Constant.VALUE_DEFAULT_PASSWORD_SIZE, message = Constant.MSG_SIZE_GREATER + Constant.VALUE_DEFAULT_PASSWORD_SIZE)
-    @Pattern(regexp = Constant.PATTERN_EXC_WHITE_SPACE, message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_INCLUDE_WHITE_SPACE)
+    @NotBlank(message = DtoField.PASSWORD_DTO_NEW_PASSWORD + Constant.MSG_NOT_BLANK)
+    @NotNull(message = DtoField.PASSWORD_DTO_NEW_PASSWORD + Constant.MSG_NOT_NULL)
+    @Size(min = Constant.VALUE_DEFAULT_PASSWORD_SIZE, message = DtoField.PASSWORD_DTO_NEW_PASSWORD + Constant.MSG_SIZE_GREATER + Constant.VALUE_DEFAULT_PASSWORD_SIZE)
+    @Pattern(regexp = Constant.PATTERN_EXC_WHITE_SPACE, message = DtoField.PASSWORD_DTO_NEW_PASSWORD + Constant.MSG_INCLUDE_WHITE_SPACE)
     @JsonAlias({"newPassword", "new_password"})
     private String newPassword;
 
-    @NotBlank
-    @NotNull
-    @Size(min = Constant.VALUE_DEFAULT_PASSWORD_SIZE, message = Constant.MSG_SIZE_GREATER + Constant.VALUE_DEFAULT_PASSWORD_SIZE)
-    @Pattern(regexp = Constant.PATTERN_EXC_WHITE_SPACE, message = DtoField.PASSWORD_DTO_PASSWORD + Constant.MSG_INCLUDE_WHITE_SPACE)
+    @NotBlank(message = DtoField.PASSWORD_DTO_CONFIRM_PASSWORD + Constant.MSG_NOT_BLANK)
+    @NotNull(message = DtoField.PASSWORD_DTO_CONFIRM_PASSWORD + Constant.MSG_NOT_NULL)
+    @Size(min = Constant.VALUE_DEFAULT_PASSWORD_SIZE, message = DtoField.PASSWORD_DTO_CONFIRM_PASSWORD + Constant.MSG_SIZE_GREATER + Constant.VALUE_DEFAULT_PASSWORD_SIZE)
+    @Pattern(regexp = Constant.PATTERN_EXC_WHITE_SPACE, message = DtoField.PASSWORD_DTO_CONFIRM_PASSWORD + Constant.MSG_INCLUDE_WHITE_SPACE)
     @JsonAlias({"reNewPassword", "re_new_password"})
     private String reNewPassword;
 }
