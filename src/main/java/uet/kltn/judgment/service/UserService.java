@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uet.kltn.judgment.constant.*;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
-import uet.kltn.judgment.dto.request.auth.SignUpRequestDto;
-import uet.kltn.judgment.dto.request.auth.UpdateUserRequestDto;
+import uet.kltn.judgment.dto.request.user.SignUpRequestDto;
+import uet.kltn.judgment.dto.request.user.UpdateUserRequestDto;
 import uet.kltn.judgment.dto.response.auth.UserResponseDto;
 import uet.kltn.judgment.model.*;
 import uet.kltn.judgment.respository.*;
@@ -75,15 +75,85 @@ public class UserService {
             Unit unit = unitRespository.findByUnitNameAndState(signUpRequestDto.getUnit(), State.ACTIVE.getId());
             user.setUnit(unit);
         }
+        user.setState(State.INACTIVE.getId());
         user = userRepository.save(user);
         return user;
 
     }
 
     public User updateUser(User currentUser, UpdateUserRequestDto updateUserRequestDto) {
-        currentUser.update(updateUserRequestDto);
+
+        if (updateUserRequestDto.getName() != null && !currentUser.getName().equals(updateUserRequestDto.getName())) {
+            currentUser.setName(updateUserRequestDto.getName());
+        }
+
+        if (updateUserRequestDto.getEmail() != null && !currentUser.getEmail().equals(updateUserRequestDto.getEmail())) {
+            currentUser.setEmail(updateUserRequestDto.getEmail());
+        }
+
+        if (updateUserRequestDto.getLevel() != null && Level.getById(currentUser.getLevel()).getName().equals(updateUserRequestDto.getLevel())) {
+            currentUser.setLevel(Level.getByName(updateUserRequestDto.getLevel()).getId());
+        }
+
+        if (updateUserRequestDto.getState() != null && State.getById(currentUser.getState()).equals(updateUserRequestDto.getState())) {
+            currentUser.setState(State.getByName(updateUserRequestDto.getState()).getId());
+        }
+
+        if (updateUserRequestDto.getUsageTime() != null && UsageTime.getById(currentUser.getUsageTime()).equals(updateUserRequestDto.getUsageTime())) {
+            currentUser.setUsageTime(UsageTime.getByName(updateUserRequestDto.getUsageTime()).getId());
+        }
+
+        if (updateUserRequestDto.getFunctions() != null && !currentUser.getFunctions().equals(updateUserRequestDto.getFunctions())) {
+            Set<Function> functions = functionRespository.findByFunctionNameInAndState(updateUserRequestDto.getFunctions(), State.ACTIVE.getId());
+            currentUser.setFunctions(functions);
+        }
+
+        if (updateUserRequestDto.getCaseTypes() != null && !currentUser.getCaseTypes().equals(updateUserRequestDto.getCaseTypes())) {
+            Set<CaseType> caseTypes = caseTypeRespository.findByCaseTypeNameInAndState(updateUserRequestDto.getCaseTypes(), State.ACTIVE.getId());
+            currentUser.setCaseTypes(caseTypes);
+        }
+
+        if (updateUserRequestDto.getPhoneNumber() != null && !currentUser.getPhoneNumber().equals(updateUserRequestDto.getPhoneNumber())) {
+            currentUser.setPhoneNumber(updateUserRequestDto.getPhoneNumber());
+        }
+
+        if (updateUserRequestDto.getRole() != null && RoleUser.getById(currentUser.getRole()).equals(updateUserRequestDto.getRole())) {
+            currentUser.setRole(RoleUser.getByName(updateUserRequestDto.getRole()).getId());
+        }
+
+        if (updateUserRequestDto.getWork() != null && !currentUser.getWork().equals(updateUserRequestDto.getWork())) {
+            Work work = workRespository.findByWorkNameAndState(updateUserRequestDto.getWork(), State.ACTIVE.getId());
+            if (work == null) work = new Work(Utils.uuid(), updateUserRequestDto.getWork());
+            workRespository.save(work);
+            currentUser.setWork(work);
+        }
+
+        if (updateUserRequestDto.getUnit() != null && !currentUser.getUnit().equals(updateUserRequestDto.getUnit())) {
+            Unit unit = unitRespository.findByUnitNameAndState(updateUserRequestDto.getUnit(), State.ACTIVE.getId());
+            currentUser.setUnit(unit);
+        }
+
+        if (updateUserRequestDto.getNumberEmployee() != null && currentUser.getNumberEmployee() != updateUserRequestDto.getNumberEmployee()) {
+            currentUser.setNumberEmployee(updateUserRequestDto.getNumberEmployee());
+        }
+
+        if (updateUserRequestDto.getDescription() != null && !currentUser.getDescription().equals(updateUserRequestDto.getDescription())) {
+            currentUser.setDescription(updateUserRequestDto.getDescription());
+        }
+
         userRepository.save(currentUser);
         return currentUser;
+    }
+
+    public User updateState(String uid) {
+        User userRepo = userRepository.findUserByUidAndState(uid, State.INACTIVE.getId());
+        if (userRepo != null) {
+            userRepo.setState(State.ACTIVE.getId());
+            userRepo.setModified(LocalDateTime.now());
+            userRepository.save(userRepo);
+            return userRepo;
+        }
+        return null;
     }
 
     public User getUserById(String id) {
@@ -155,7 +225,7 @@ public class UserService {
         for (int i = role; i <= 4; i++) {
             roleList.add(i);
         }
-        Page<User> userPage = userRepository.findAllByStateAndPowerIn(expressionDto.getPageable(), State.ACTIVE.getId(), roleList);
+        Page<User> userPage = userRepository.findAllByPowerIn(expressionDto.getPageable(), roleList);
         List<User> users = userPage.getContent();
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
         users.forEach(user -> {
@@ -167,12 +237,12 @@ public class UserService {
                             user.getPhoneNumber(),
                             user.getDescription(),
                             user.getAvatar(),
-                            user.getGender() != null ? Gender.getById(user.getGender()).name() : null,
+                            user.getGender() != null ? Gender.getById(user.getGender()).getName() : null,
                             user.getBirthday(),
-                            Power.getById(user.getPower()).name(),
-                            State.getById(user.getState()).name(),
-                            user.getUsageTime() != null ? UsageTime.getById(user.getUsageTime()).name() : null,
-                            RoleUser.getById(user.getRole()).name(),
+                            Power.getById(user.getPower()).getName(),
+                            State.getById(user.getState()).getName(),
+                            user.getUsageTime() != null ? UsageTime.getById(user.getUsageTime()).getName() : null,
+                            RoleUser.getById(user.getRole()).getName(),
                             user.getUnit() != null ? user.getUnit().getUnitName() : null,
                             user.getWork() != null ? user.getWork().getWorkName() : null,
                             0,
@@ -185,7 +255,7 @@ public class UserService {
     }
 
     public PageDto getUserIsEnterpriseManagement(ExpressionDto expressionDto) {
-        Page<User> userPage = userRepository.findByLevelAndRoleAndState(expressionDto.getPageable(), Level.LEVEL_ENTERPRISE.getId(), RoleUser.ROLE_MANAGER.getId(), State.ACTIVE.getId());
+        Page<User> userPage = userRepository.findByLevelAndRole(expressionDto.getPageable(), Level.LEVEL_ENTERPRISE.getId(), RoleUser.ROLE_MANAGER.getId());
         List<User> users = userPage.getContent();
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
         users.forEach(user -> {

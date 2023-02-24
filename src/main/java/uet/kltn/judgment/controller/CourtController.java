@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uet.kltn.judgment.dto.response.court.CourtResponseDto;
-import uet.kltn.judgment.security.CurrentUser;
-import uet.kltn.judgment.security.UserPrincipal;
 import uet.kltn.judgment.service.CourtService;
 
 import java.util.List;

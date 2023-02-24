@@ -35,4 +35,6 @@ public interface JudgmentRepository extends JpaRepository<Judgment, String> {
 
     @Query("SELECT j.judgmentLevel FROM Judgment j GROUP BY j.judgmentLevel")
     Set<String> findJudgmentLevels();
+
+
 }

@@ -4,19 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 import uet.kltn.judgment.constant.UsageTime;
-import uet.kltn.judgment.dto.request.auth.SignUpRequestDto;
-import uet.kltn.judgment.dto.request.auth.UpdateUserRequestDto;
-import uet.kltn.judgment.util.Utils;
+import uet.kltn.judgment.dto.request.user.SignUpRequestDto;
+import uet.kltn.judgment.dto.request.user.UpdateUserRequestDto;
 
 import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Getter

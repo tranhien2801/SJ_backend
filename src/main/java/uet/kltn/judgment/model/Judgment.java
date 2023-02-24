@@ -79,7 +79,7 @@ public class Judgment extends BaseEntity {
         @JoinColumn(name = "`case_uid`")
         private Case aCase;
 
-        @ManyToMany(mappedBy = "judgments")
+        @ManyToMany(fetch = FetchType.EAGER, mappedBy = "judgments", cascade = CascadeType.ALL)
         @JsonIgnore
         private Set<User> users;
 

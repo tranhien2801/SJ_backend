@@ -10,7 +10,7 @@ import uet.kltn.judgment.constant.DtoField;
 import uet.kltn.judgment.constant.Power;
 import uet.kltn.judgment.dto.ResponseDto;
 import uet.kltn.judgment.dto.request.auth.AuthDto;
-import uet.kltn.judgment.dto.request.auth.SignUpRequestDto;
+import uet.kltn.judgment.dto.request.user.SignUpRequestDto;
 import uet.kltn.judgment.dto.response.auth.AuthResponseDto;
 import uet.kltn.judgment.model.User;
 import uet.kltn.judgment.security.CurrentUser;

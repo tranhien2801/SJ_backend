@@ -10,11 +10,15 @@ import uet.kltn.judgment.constant.Power;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.judgment.FilterJudgmentRequestDto;
+import uet.kltn.judgment.dto.request.judgment.JudgmentErrorRequestDto;
+import uet.kltn.judgment.dto.request.judgment.LikedJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
 import uet.kltn.judgment.dto.response.judgment.JudgmentResponseDto;
 import uet.kltn.judgment.model.Judgment;
+import uet.kltn.judgment.model.JudgmentError;
 import uet.kltn.judgment.security.CurrentUser;
 import uet.kltn.judgment.security.UserPrincipal;
+import uet.kltn.judgment.service.JudgmentErrorService;
 import uet.kltn.judgment.service.JudgmentService;
 import uet.kltn.judgment.service.UserService;
 
@@ -30,6 +34,9 @@ import java.util.Set;
 public class JudgmentController extends GenController {
     @Autowired
     private JudgmentService judgmentService;
+
+    @Autowired
+    private JudgmentErrorService judgmentErrorService;
 
     @Autowired
     private UserService userService;
@@ -84,6 +91,26 @@ public class JudgmentController extends GenController {
         }
     }
 
+    @PostMapping("/liked")
+    public ResponseEntity<?> likedJudgment(@CurrentUser UserPrincipal userPrincipal,
+                                           Authentication authentication,
+                                           @RequestBody LikedJudgmentRequestDto likedJudgmentRequestDto){
+        try {
+            if (userPrincipal == null || !userPrincipal.getId().equals(likedJudgmentRequestDto.getUserUid())) {
+                return responseUtil.getForbiddenResponse();
+            }
+
+            if (!judgmentService.userLikedJudgment(likedJudgmentRequestDto)) {
+                return responseUtil.getNotFoundResponse(likedJudgmentRequestDto.getJudgmentUid());
+            }
+            return responseUtil.getSuccessResponse(likedJudgmentRequestDto);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
     @PutMapping(path = "/{uid}")
     public ResponseEntity<?> updateJudgment(@PathVariable(value = "uid") String uid,
                                             @Valid @RequestBody UpdateJudgmentRequestDto updateJudgmentRequestDto,
@@ -125,6 +152,24 @@ public class JudgmentController extends GenController {
             return responseUtil.getSuccessResponse();
         } catch (Exception e) {
             e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
+    @PostMapping("/error")
+    public ResponseEntity<?> reportJudgmentError(@CurrentUser UserPrincipal userPrincipal,
+                                                 @Valid @RequestBody JudgmentErrorRequestDto judgmentErrorRequestDto,
+                                                 Authentication authentication) {
+        try {
+            if (userPrincipal == null || !userPrincipal.getId().equals(judgmentErrorRequestDto.getUserUid())) {
+                return responseUtil.getForbiddenResponse();
+            }
+            JudgmentError judgmentError = judgmentErrorService.createJudgmentError(judgmentErrorRequestDto);
+            if (judgmentError == null) {
+                return responseUtil.getNotFoundResponse("Bản án không phù hợp hoặc người dùng không đúng");
+            }
+            return responseUtil.getSuccessResponse(judgmentErrorRequestDto);
+        } catch (Exception e) {
             return responseUtil.getInternalServerErrorResponse();
         }
     }

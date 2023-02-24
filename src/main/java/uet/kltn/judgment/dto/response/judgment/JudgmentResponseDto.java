@@ -16,6 +16,9 @@ public class JudgmentResponseDto {
     @JsonProperty("uid")
     private String uid;
 
+    @JsonProperty("user_uid")
+    private String userUid;
+
     @JsonProperty("judgment_number")
     private String judgmentNumber;
 

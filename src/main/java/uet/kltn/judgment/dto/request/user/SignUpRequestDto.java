@@ -1,4 +1,4 @@
-package uet.kltn.judgment.dto.request.auth;
+package uet.kltn.judgment.dto.request.user;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -35,5 +35,11 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Page<User> findAllByStateAndPowerIn(Pageable pageable, int state, List<Integer> listPower);
 
+    Page<User> findAllByPowerIn(Pageable pageable, List<Integer> listPower);
+
+
     Page<User> findByLevelAndRoleAndState(Pageable pageable, int level, int role, int state);
+
+    Page<User> findByLevelAndRole(Pageable pageable, int level, int role);
+
 }

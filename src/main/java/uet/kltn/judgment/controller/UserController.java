@@ -12,7 +12,7 @@ import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.auth.ChangePasswordRequestDto;
 import uet.kltn.judgment.dto.request.auth.ResetPasswordRequestDto;
-import uet.kltn.judgment.dto.request.auth.UpdateUserRequestDto;
+import uet.kltn.judgment.dto.request.user.UpdateUserRequestDto;
 import uet.kltn.judgment.model.User;
 import uet.kltn.judgment.security.CurrentUser;
 import uet.kltn.judgment.security.UserPrincipal;
@@ -92,21 +92,10 @@ public class UserController extends GenController {
             String email = updateUserRequestDto.getEmail();
             String phoneNumber = updateUserRequestDto.getPhoneNumber();
 
-            if (updateUserRequestDto.getRole() <= Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId()) {
-                return responseUtil.getForbiddenResponse();
-            }
-
-            if ((email == null || email.isBlank()) && (phoneNumber == null || phoneNumber.isBlank())) {
-                Map<String, List<String>> errorMap = new HashMap<>();
-                List<String> error = new ArrayList<>();
-                error.add("email and phone number null");
-                errorMap.put(DtoField.PARAM_USERNAME, error);
-                return responseUtil.getBadRequestResponse(errorMap);
-            }
             if (phoneNumber != null && !phoneNumber.isBlank() && !phoneNumber.matches("[^\\s]+")) {
                 Map<String, List<String>> errorMap = new HashMap<>();
                 List<String> error = new ArrayList<>();
-                error.add("not correct format phone number");
+                error.add("Số điện thoại không đúng định dạng");
                 errorMap.put(DtoField.PARAM_PHONE_NUMBER, error);
                 return responseUtil.getBadRequestResponse(errorMap);
             }
@@ -240,6 +229,20 @@ public class UserController extends GenController {
 
             userService.deleteListUser(users);
             return responseUtil.getSuccessResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
+    @GetMapping("/confirm-signup/{id}")
+    public ResponseEntity<?> confirmSignup(@PathVariable(value = "id") String id) {
+        try {
+            User user = userService.updateState(id);
+            if (user == null) {
+                return responseUtil.getBadRequestResponse("Không tìm thấy người dùng trong hệ thống");
+            }
+            return responseUtil.getSuccessResponse("Kích hoạt tài khoản thành công!");
         } catch (Exception e) {
             e.printStackTrace();
             return responseUtil.getInternalServerErrorResponse();

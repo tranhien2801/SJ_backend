@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 public class AppProperties {
     private final Auth auth = new Auth();
+    private final Notification notification = new Notification();
 
     public static class Auth {
         private String tokenSecret;
@@ -40,6 +41,18 @@ public class AppProperties {
 
     public Auth getAuth() {
         return auth;
+    }
+
+    @Setter
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Notification {
+        private String confirmSignup;
+    }
+
+    public Notification getNotification() {
+        return notification;
     }
 
 
