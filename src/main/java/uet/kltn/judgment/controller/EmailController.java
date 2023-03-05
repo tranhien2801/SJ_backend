@@ -1,14 +1,12 @@
 package uet.kltn.judgment.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uet.kltn.judgment.dto.request.user.SignUpRequestDto;
-import uet.kltn.judgment.model.email.EmailDetails;
 import uet.kltn.judgment.security.CurrentUser;
 import uet.kltn.judgment.security.UserPrincipal;
 import uet.kltn.judgment.service.email.EmailService;
@@ -20,26 +18,19 @@ public class EmailController extends GenController{
 
     // Sending a simple Email
     @PostMapping("/sendMail")
-    public ResponseEntity<?> sendMail(@RequestBody SignUpRequestDto signUpRequestDto,
+    public ResponseEntity<?> sendConfirmSignup(@RequestBody SignUpRequestDto signUpRequestDto,
                                       @CurrentUser UserPrincipal userPrincipal,
                                       Authentication authentication )     {
         try {
             if (userPrincipal == null) {
                 return responseUtil.getForbiddenResponse();
             }
-            String msg = emailService.sendSimpleMail(signUpRequestDto);
+            String msg = emailService.sendConfirmSignup(signUpRequestDto);
             return responseUtil.getSuccessResponse(msg);
         } catch (Exception e) {
             return responseUtil.getInternalServerErrorResponse();
         }
     }
 
-    // Sending email with attachment
-    @PostMapping("/sendMailWithAttachment")
-    public String sendMailWithAttachment(
-            @RequestBody EmailDetails details) {
-        String status = emailService.sendMailWithAttachment(details);
 
-        return status;
-    }
 }

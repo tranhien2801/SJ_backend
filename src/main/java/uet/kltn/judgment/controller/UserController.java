@@ -17,6 +17,7 @@ import uet.kltn.judgment.model.User;
 import uet.kltn.judgment.security.CurrentUser;
 import uet.kltn.judgment.security.UserPrincipal;
 import uet.kltn.judgment.service.UserService;
+import uet.kltn.judgment.service.email.EmailService;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ import java.util.Map;
 public class UserController extends GenController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EmailService emailService;
 
     public UserController() {
 
@@ -241,6 +245,12 @@ public class UserController extends GenController {
             User user = userService.updateState(id);
             if (user == null) {
                 return responseUtil.getBadRequestResponse("Không tìm thấy người dùng trong hệ thống");
+            }
+            if (userService.isSevenDaysTrial(user.getUid())) {
+                System.out.println("Gửi thư thông báo thời hạn sử dụng tài khoản Trial");
+                emailService.sendNotiSevenDaysTrial(user);
+            } else {
+                System.out.println("Không gửi email");
             }
             return responseUtil.getSuccessResponse("Kích hoạt tài khoản thành công!");
         } catch (Exception e) {

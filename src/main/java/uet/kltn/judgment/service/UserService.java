@@ -316,4 +316,11 @@ public class UserService {
         });
         userRepository.saveAll(users);
     }
+
+    public boolean isSevenDaysTrial(String uid) {
+        User user = userRepository.findUserByUidAndUsageTimeAndState(uid, UsageTime.SEVEN_DAYS_TRIAL.getId(), State.ACTIVE.getId());
+        if (user != null) return true;
+        else return false;
+    }
+
 }
