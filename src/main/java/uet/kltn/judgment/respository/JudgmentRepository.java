@@ -35,16 +35,6 @@ public interface JudgmentRepository extends JpaRepository<Judgment, String> {
             "AND j.state = :state")
     Page<Judgment> findByFilterAndState(Pageable pageable, String judgmentNumber, String courtLevel, String judgmentLevel, String typeDocument, String caseType, int state);
 
-    @Query("SELECT j FROM Judgment j " +
-            "LEFT JOIN j.court jc " +
-            "LEFT JOIN j.aCase ja " +
-            "WHERE jc.courtLevel LIKE %:courtLevel " +
-            "AND j.judgmentLevel LIKE %:judgmentLevel " +
-            "AND j.typeDocument LIKE %:typeDocument " +
-            "AND ja.caseType LIKE %:caseType " +
-            "AND j.state = :state")
-    List<Judgment> findByFilterAndStateForPython(String courtLevel, String judgmentLevel, String typeDocument, String caseType, int state);
-
     @Query("SELECT j.judgmentLevel FROM Judgment j GROUP BY j.judgmentLevel")
     Set<String> findJudgmentLevels();
 
