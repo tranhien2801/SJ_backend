@@ -80,6 +80,33 @@ public class JudgmentController extends GenController {
         }
     }
 
+    @PostMapping("/list1")
+    public ResponseEntity<?> getJudgmentsFilterByPython(@CurrentUser UserPrincipal userPrincipal,
+                                              Authentication authentication,
+                                              @RequestParam Map<String, Object> request,
+                                              @RequestBody(required = false) FilterJudgmentRequestDto filterJudgmentRequestDto) {
+        try {
+            if (userPrincipal == null) {
+                return responseUtil.getForbiddenResponse();
+            }
+
+//            PageDto response = new PageDto();
+//            Map<String, Object> params = utils.getExpressionAndParams(request, Judgment.class);
+//            ExpressionDto expressionDto = (ExpressionDto) params.get("expression");
+//            response = judgmentService.getJudgmentsByFilter(expressionDto, filterJudgmentRequestDto);
+//            return responseUtil.getSuccessResponse(response);
+
+            List<JudgmentResponseDto> response;
+            Map<String, Object> params = utils.getExpressionAndParams(request, Judgment.class);
+            ExpressionDto expressionDto = (ExpressionDto) params.get("expression");
+            response = judgmentService.filterByPython(filterJudgmentRequestDto);
+            return responseUtil.getSuccessResponse(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
     @GetMapping("/judgment-level")
     public ResponseEntity<?> getCourtLevels(Authentication authentication) {
         try {

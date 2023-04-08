@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,18 @@ import uet.kltn.judgment.model.User;
 import uet.kltn.judgment.respository.JudgmentRepository;
 import uet.kltn.judgment.respository.UserRepository;
 
+import org.python.core.*;
+import org.python.util.PythonInterpreter;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -75,6 +82,67 @@ public class JudgmentService {
 
     public List<Judgment> getJudgmentByUids(List<String> uids) {
         return judgmentRepository.findByUidInAndState(uids, State.ACTIVE.getId());
+    }
+
+    public List<JudgmentResponseDto> filterByPython(FilterJudgmentRequestDto filterJudgmentRequestDto) throws IOException {
+//        PythonInterpreter interpreter = new PythonInterpreter();
+//        interpreter.execfile("test.py");
+//        interpreter.set("x", new PyInteger(100));
+//        interpreter.exec("print x");
+//
+//        // Execute a sum
+//        interpreter.exec("y = 25+45");
+//        PyObject y = interpreter.get("y");
+//        PyObject h = interpreter.get("get_name");
+//        System.out.println(h.__call__().__tojava__(String.class));
+//        System.out.println("y: "+y);
+
+        Process p = Runtime.getRuntime().exec("python uet/kltn/judgment/service/test.py");
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        System.out.println(in.readLine());
+
+        return null;
+    }
+
+
+    public List<JudgmentResponseDto> getJudgmentsByPython(FilterJudgmentRequestDto filterJudgmentRequestDto) {
+        List<Judgment> judgments;
+        if (filterJudgmentRequestDto == null || filterJudgmentRequestDto.isEmpty()) {
+            judgments = judgmentRepository.findAllByState(State.ACTIVE.getId());
+        } else {
+            judgments = judgmentRepository.findByFilterAndStateForPython(
+                    filterJudgmentRequestDto.getCourtLevel() != null ? filterJudgmentRequestDto.getCourtLevel() : "",
+                    filterJudgmentRequestDto.getJudgmentLevel() != null ? filterJudgmentRequestDto.getJudgmentLevel() : "",
+                    filterJudgmentRequestDto.getTypeDocument() != null ? filterJudgmentRequestDto.getTypeDocument() : "",
+                    filterJudgmentRequestDto.getCaseType() != null ? filterJudgmentRequestDto.getCaseType() : "",
+                    State.ACTIVE.getId()
+            );
+        }
+        List<JudgmentResponseDto> judgmentResponseDtos = new ArrayList<>();
+        judgments.forEach(judgment -> {
+            judgmentResponseDtos.add(
+                    new JudgmentResponseDto(
+                            judgment.getUid(),
+                            judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
+                            judgment.getJudgmentNumber(),
+                            judgment.getJudgmentName(),
+                            judgment.getTypeDocument(),
+                            judgment.getJudgmentLevel(),
+                            judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
+                            judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
+                            judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
+                            judgment.getJudgmentContent(),
+                            judgment.getJudgmentText(),
+                            judgment.getDateIssued(),
+                            judgment.getDateUpload(),
+                            judgment.getUrl(),
+                            judgment.getFileDownload(),
+                            judgment.getPdfViewer(),
+                            judgment.getCountVote(),
+                            judgment.getCountEyes(),
+                            judgment.getCountDownload()));
+        });
+        return judgmentResponseDtos;
     }
 
     public PageDto getJudgmentsByFilter(ExpressionDto expressionDto, FilterJudgmentRequestDto filterJudgmentRequestDto) {
