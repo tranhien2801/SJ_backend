@@ -67,4 +67,7 @@ public class UserResponseDto {
 
     @JsonProperty("last_login")
     private LocalDateTime lastLogin;
+
+    @JsonProperty("level")
+    private String level;
 }

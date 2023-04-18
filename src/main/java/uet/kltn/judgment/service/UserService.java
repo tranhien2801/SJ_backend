@@ -214,7 +214,8 @@ public class UserService {
                             0,
                             user.getCaseTypes().stream().findFirst().orElseThrow().getCaseTypeName(),
                             user.getFunctions().stream().findFirst().orElseThrow().getFunctionName(),
-                            user.getLastLogin()));
+                            user.getLastLogin(),
+                            user.getLevel() != null ? Level.getById(user.getLevel()).getName() : null));
         });
 
         return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
@@ -248,7 +249,9 @@ public class UserService {
                             0,
                             user.getCaseTypes().size() != 0 ? user.getCaseTypes().stream().findFirst().orElseThrow().getCaseTypeName() : null,
                             user.getFunctions().size() != 0 ? user.getFunctions().stream().findFirst().orElseThrow().getFunctionName() : null,
-                            user.getLastLogin()));
+                            user.getLastLogin(),
+                            user.getLevel() != null ? Level.getById(user.getLevel()).getName() : null
+                            ));
         });
 
         return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
@@ -278,7 +281,9 @@ public class UserService {
                             0,
                             user.getCaseTypes().size() != 0 ? user.getCaseTypes().stream().findFirst().orElseThrow().getCaseTypeName() : null,
                             user.getFunctions().size() != 0 ? user.getFunctions().stream().findFirst().orElseThrow().getFunctionName() : null,
-                            user.getLastLogin()));
+                            user.getLastLogin(),
+                            user.getLevel() != null ? Level.getById(user.getLevel()).getName() : null
+                    ));
         });
         return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
     }
