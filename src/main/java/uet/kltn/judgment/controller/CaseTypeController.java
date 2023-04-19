@@ -41,7 +41,11 @@ public class CaseTypeController extends GenController{
     public ResponseEntity<?> getCaseTypesList(Authentication authentication) {
         try {
             Set<CaseTypeResponseDto> response = caseTypeService.getAllCaseTypes();
-
+            if (response == null) {
+                this.createCaseTypes();
+                System.out.println("Tạo dữ liệu bảng case_type...");
+                response = caseTypeService.getAllCaseTypes();
+            }
             return responseUtil.getSuccessResponse(response);
         } catch (Exception e) {
             e.printStackTrace();

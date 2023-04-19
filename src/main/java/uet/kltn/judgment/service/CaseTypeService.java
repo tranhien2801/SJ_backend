@@ -32,6 +32,8 @@ public class CaseTypeService {
 
     public Set<CaseTypeResponseDto> getAllCaseTypes() {
         Set<CaseType> caseTypes = caseTypeRepository.findAllByState(State.ACTIVE.getId());
+        System.out.println(caseTypes);
+        if (caseTypes.size() == 0)  return null;
         Set<CaseTypeResponseDto> caseTypeResponseDtos = new HashSet<>();
         for (CaseType caseType : caseTypes) {
             caseTypeResponseDtos.add(new CaseTypeResponseDto(caseType.getUid(), caseType.getCaseTypeName(), caseType.getState(),caseType.getCreated(), caseType.getModified()));

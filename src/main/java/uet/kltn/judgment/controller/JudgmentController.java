@@ -73,6 +73,9 @@ public class JudgmentController extends GenController {
             Map<String, Object> params = utils.getExpressionAndParams(request, Judgment.class);
             ExpressionDto expressionDto = (ExpressionDto) params.get("expression");
             response = judgmentService.getJudgmentsByFilter(expressionDto, filterJudgmentRequestDto);
+            if (response == null) {
+                return responseUtil.getInternalServerErrorResponse();
+            }
             return responseUtil.getSuccessResponse(response);
         } catch (Exception e) {
             e.printStackTrace();

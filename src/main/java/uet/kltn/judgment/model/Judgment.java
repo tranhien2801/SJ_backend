@@ -71,6 +71,9 @@ public class Judgment extends BaseEntity {
         @Column(name = "`count_download`", columnDefinition = "INT", nullable = false)
         private int countDownload;
 
+        @Column(name = "`precedent`", columnDefinition = "TINYINT(10) DEFAULT 0", nullable = true)
+        private int precedent;
+
         @ManyToOne
         @JoinColumn(name = "`court_uid`")
         private Court court;

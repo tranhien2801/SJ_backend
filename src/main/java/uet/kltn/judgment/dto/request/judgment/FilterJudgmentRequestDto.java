@@ -6,12 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class FilterJudgmentRequestDto {
-    @JsonAlias("judgment_number")
+    @JsonAlias("judgment_content")
     private String judgmentNumber;
 
     @JsonAlias("court_level")
@@ -26,8 +28,21 @@ public class FilterJudgmentRequestDto {
     @JsonAlias("case_type")
     private String caseType;
 
+    @JsonAlias("date_from")
+    private Date dateFrom;
+
+    @JsonAlias("date_to")
+    private Date dateTo;
+
+    @JsonAlias("vote")
+    private Boolean vote;
+
+    @JsonAlias("precedent")
+    private Boolean precedent;
+
     public boolean isEmpty() {
-        return judgmentNumber == null && courtLevel == null && judgmentLevel == null && typeDocument == null && caseType == null;
+        return judgmentNumber == null && courtLevel == null && judgmentLevel == null && typeDocument == null
+                && caseType == null && dateFrom == null && dateTo == null && vote == null && precedent == null;
     }
 
 }

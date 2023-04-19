@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.python.core.PyObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import uet.kltn.judgment.constant.Precedent;
 import uet.kltn.judgment.constant.State;
+import uet.kltn.judgment.constant.Vote;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.judgment.FilterJudgmentRequestDto;
@@ -20,18 +21,11 @@ import uet.kltn.judgment.model.User;
 import uet.kltn.judgment.respository.JudgmentRepository;
 import uet.kltn.judgment.respository.UserRepository;
 
-import org.python.core.*;
-import org.python.util.PythonInterpreter;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.sql.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -85,45 +79,71 @@ public class JudgmentService {
     }
 
     public PageDto getJudgmentsByFilter(ExpressionDto expressionDto, FilterJudgmentRequestDto filterJudgmentRequestDto) {
-        Page<Judgment> judgmentPage;
-        if (filterJudgmentRequestDto == null || filterJudgmentRequestDto.isEmpty()) {
-            judgmentPage = judgmentRepository.findAllByState(expressionDto.getPageable(), State.ACTIVE.getId());
-        } else {
-            judgmentPage = judgmentRepository.findByFilterAndState(
-                    expressionDto.getPageable(),
-                    filterJudgmentRequestDto.getJudgmentNumber() != null ? filterJudgmentRequestDto.getJudgmentNumber() : "",
-                    filterJudgmentRequestDto.getCourtLevel() != null ? filterJudgmentRequestDto.getCourtLevel() : "",
-                    filterJudgmentRequestDto.getJudgmentLevel() != null ? filterJudgmentRequestDto.getJudgmentLevel() : "",
-                    filterJudgmentRequestDto.getTypeDocument() != null ? filterJudgmentRequestDto.getTypeDocument() : "",
-                    filterJudgmentRequestDto.getCaseType() != null ? filterJudgmentRequestDto.getCaseType() : "",
-                    State.ACTIVE.getId());
+        try {
+            Page<Judgment> judgmentPage;
+            if (filterJudgmentRequestDto == null || filterJudgmentRequestDto.isEmpty()) {
+                judgmentPage = judgmentRepository.findAllByStateOrderByDateIssued(expressionDto.getPageable(), State.ACTIVE.getId());
+            } else {
+                Date dateFrom = (filterJudgmentRequestDto.getDateFrom() != null) ? filterJudgmentRequestDto.getDateFrom() : Date.valueOf("2022-11-01");
+                Date dateTo = filterJudgmentRequestDto.getDateTo() != null ? filterJudgmentRequestDto.getDateTo() : Date.valueOf("2022-11-30");
+                Integer vote = filterJudgmentRequestDto.getVote() != null ? Vote.IS_VOTED.getId() : Vote.NO_IS_VOTED.getId();
+                if (filterJudgmentRequestDto.getPrecedent() == null) {
+                    judgmentPage = judgmentRepository.findByFilterAndState(
+                            expressionDto.getPageable(),
+                            filterJudgmentRequestDto.getJudgmentNumber() != null ? filterJudgmentRequestDto.getJudgmentNumber() : "",
+                            filterJudgmentRequestDto.getCourtLevel() != null ? filterJudgmentRequestDto.getCourtLevel() : "",
+                            filterJudgmentRequestDto.getJudgmentLevel() != null ? filterJudgmentRequestDto.getJudgmentLevel() : "",
+                            filterJudgmentRequestDto.getTypeDocument() != null ? filterJudgmentRequestDto.getTypeDocument() : "",
+                            filterJudgmentRequestDto.getCaseType() != null ? filterJudgmentRequestDto.getCaseType() : "",
+                            dateFrom,
+                            dateTo,
+                            vote,
+                            State.ACTIVE.getId());
+                } else {
+                    judgmentPage = judgmentRepository.findByFilterAndStateAndPrecedent(
+                            expressionDto.getPageable(),
+                            filterJudgmentRequestDto.getJudgmentNumber() != null ? filterJudgmentRequestDto.getJudgmentNumber() : "",
+                            filterJudgmentRequestDto.getCourtLevel() != null ? filterJudgmentRequestDto.getCourtLevel() : "",
+                            filterJudgmentRequestDto.getJudgmentLevel() != null ? filterJudgmentRequestDto.getJudgmentLevel() : "",
+                            filterJudgmentRequestDto.getTypeDocument() != null ? filterJudgmentRequestDto.getTypeDocument() : "",
+                            filterJudgmentRequestDto.getCaseType() != null ? filterJudgmentRequestDto.getCaseType() : "",
+                            dateFrom,
+                            dateTo,
+                            vote,
+                            filterJudgmentRequestDto.getPrecedent() == true ? Precedent.APPLYING_PRECEDENT.getId() : Precedent.NO_APPLYING_PRECEDENT.getId(),
+                            State.ACTIVE.getId());
+                }
+            }
+            List<Judgment> judgments = judgmentPage.getContent();
+            List<JudgmentResponseDto> judgmentResponseDtos = new ArrayList<>();
+            judgments.forEach(judgment -> {
+                judgmentResponseDtos.add(
+                        new JudgmentResponseDto(
+                                judgment.getUid(),
+                                judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
+                                judgment.getJudgmentNumber(),
+                                judgment.getJudgmentName(),
+                                judgment.getTypeDocument(),
+                                judgment.getJudgmentLevel(),
+                                judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
+                                judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
+                                judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
+                                judgment.getJudgmentContent(),
+                                judgment.getJudgmentText(),
+                                judgment.getDateIssued(),
+                                judgment.getDateUpload(),
+                                judgment.getUrl(),
+                                judgment.getFileDownload(),
+                                judgment.getPdfViewer(),
+                                judgment.getCountVote(),
+                                judgment.getCountEyes(),
+                                judgment.getCountDownload()));
+            });
+            return new PageDto(judgmentResponseDtos, expressionDto.getPageable().getPageSize(), judgmentPage.getTotalElements(), expressionDto.getPage());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return null;
         }
-        List<Judgment> judgments = judgmentPage.getContent();
-        List<JudgmentResponseDto> judgmentResponseDtos = new ArrayList<>();
-        judgments.forEach(judgment -> {
-            judgmentResponseDtos.add(
-                    new JudgmentResponseDto(
-                            judgment.getUid(),
-                            judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
-                            judgment.getJudgmentNumber(),
-                            judgment.getJudgmentName(),
-                            judgment.getTypeDocument(),
-                            judgment.getJudgmentLevel(),
-                            judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
-                            judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
-                            judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
-                            judgment.getJudgmentContent(),
-                            judgment.getJudgmentText(),
-                            judgment.getDateIssued(),
-                            judgment.getDateUpload(),
-                            judgment.getUrl(),
-                            judgment.getFileDownload(),
-                            judgment.getPdfViewer(),
-                            judgment.getCountVote(),
-                            judgment.getCountEyes(),
-                            judgment.getCountDownload()));
-        });
-        return new PageDto(judgmentResponseDtos, expressionDto.getPageable().getPageSize(), judgmentPage.getTotalElements(), expressionDto.getPage());
     }
 
     public void deleteListJudgment(List<Judgment> judgments) {
