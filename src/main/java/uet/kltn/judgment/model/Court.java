@@ -8,6 +8,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Getter
@@ -15,7 +16,10 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "`court`")
+@Table(name = "`court`",
+        indexes = {
+            @Index(name = "index_court_level", columnList = "court_level")
+        })
 @Where(clause = "state != 3")
 public class Court extends BaseEntity {
     @Column(name = "`court_name`", columnDefinition = "VARCHAR(255)", nullable = false)

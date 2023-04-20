@@ -63,7 +63,6 @@ public class JudgmentService {
                 judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
                 judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
                 judgment.getJudgmentContent(),
-                judgment.getJudgmentText(),
                 judgment.getDateIssued(),
                 judgment.getDateUpload(),
                 judgment.getUrl(),
@@ -129,7 +128,6 @@ public class JudgmentService {
                                 judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
                                 judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
                                 judgment.getJudgmentContent(),
-                                judgment.getJudgmentText(),
                                 judgment.getDateIssued(),
                                 judgment.getDateUpload(),
                                 judgment.getUrl(),
@@ -166,12 +164,6 @@ public class JudgmentService {
         try {
             Set<Judgment> judgmentSet = user.getJudgments();
             Set<Judgment> newJudgments = new HashSet<>();
-//            if (judgmentSet.contains(judgment)) {
-//                System.out.println("Đã like");
-//                judgmentSet.remove(judgment);
-//            } else {
-//                judgmentSet.add(judgment);
-//            }
             boolean liked = false;
             for(Judgment judgment1 : judgmentSet) {
                 if (judgment1.getUid().equals(judgment.getUid())) {
@@ -194,6 +186,66 @@ public class JudgmentService {
             return false;
         }
         return true;
+    }
+
+    public JudgmentResponseDto viewJudgmentDetail(String uid) {
+        try {
+            Judgment judgment = judgmentRepository.findByUid(uid);
+            judgment.setCountEyes(judgment.getCountEyes()+1);
+            judgmentRepository.save(judgment);
+            return new JudgmentResponseDto(
+                    judgment.getUid(),
+                    judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
+                    judgment.getJudgmentNumber(),
+                    judgment.getJudgmentName(),
+                    judgment.getTypeDocument(),
+                    judgment.getJudgmentLevel(),
+                    judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
+                    judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
+                    judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
+                    judgment.getJudgmentContent(),
+                    judgment.getDateIssued(),
+                    judgment.getDateUpload(),
+                    judgment.getUrl(),
+                    judgment.getFileDownload(),
+                    judgment.getPdfViewer(),
+                    judgment.getCountVote(),
+                    judgment.getCountEyes(),
+                    judgment.getCountDownload());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public JudgmentResponseDto downloadJudgment(String uid) {
+        try {
+            Judgment judgment = judgmentRepository.findByUid(uid);
+            judgment.setCountDownload(judgment.getCountDownload()+1);
+            judgmentRepository.save(judgment);
+            return new JudgmentResponseDto(
+                    judgment.getUid(),
+                    judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
+                    judgment.getJudgmentNumber(),
+                    judgment.getJudgmentName(),
+                    judgment.getTypeDocument(),
+                    judgment.getJudgmentLevel(),
+                    judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
+                    judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
+                    judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
+                    judgment.getJudgmentContent(),
+                    judgment.getDateIssued(),
+                    judgment.getDateUpload(),
+                    judgment.getUrl(),
+                    judgment.getFileDownload(),
+                    judgment.getPdfViewer(),
+                    judgment.getCountVote(),
+                    judgment.getCountEyes(),
+                    judgment.getCountDownload());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

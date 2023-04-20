@@ -1,6 +1,7 @@
 package uet.kltn.judgment.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jnr.ffi.annotations.In;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,10 @@ import java.util.Set;
 @Table(name = "`judgment`",
         indexes = {
                 @Index(name = "index_uid", columnList = "uid"),
-                @Index(name = "index_judgment_number", columnList = "judgment_number")
+                @Index(name = "index_judgment_number", columnList = "judgment_number"),
+                @Index(name = "index_judgment_content", columnList = "judgment_content"),
+                @Index(name = "index_judgment_level", columnList = "judgment_level"),
+                @Index(name = "index_type_document", columnList = "type_document"),
         })
 @Where(clause = "state != 3")
 public class Judgment extends BaseEntity {

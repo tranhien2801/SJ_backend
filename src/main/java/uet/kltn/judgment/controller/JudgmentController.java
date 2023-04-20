@@ -53,6 +53,48 @@ public class JudgmentController extends GenController {
             if (judgment == null) {
                 return responseUtil.getNotFoundResponse(uid);
             }
+            judgment.setCountEyes(judgment.getCountEyes()+1);
+            return responseUtil.getSuccessResponse(judgment);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
+    @GetMapping(path = "/{uid}/view")
+    public ResponseEntity<?> viewJudgment(@PathVariable(value = "uid") String uid,
+                                              @CurrentUser UserPrincipal userPrincipal,
+                                              Authentication authentication) {
+        try {
+            if (userPrincipal == null) {
+                return responseUtil.getForbiddenResponse();
+            }
+            JudgmentResponseDto judgment = judgmentService.getJudgmentResponseDtoByUid(uid);
+            if (judgment == null) {
+                return responseUtil.getNotFoundResponse(uid);
+            }
+            judgment = judgmentService.viewJudgmentDetail(judgment.getUid());
+            return responseUtil.getSuccessResponse(judgment);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
+
+    @GetMapping(path = "/{uid}/download")
+    public ResponseEntity<?> downloadJudgment(@PathVariable(value = "uid") String uid,
+                                         @CurrentUser UserPrincipal userPrincipal,
+                                         Authentication authentication) {
+        try {
+            if (userPrincipal == null) {
+                return responseUtil.getForbiddenResponse();
+            }
+            JudgmentResponseDto judgment = judgmentService.getJudgmentResponseDtoByUid(uid);
+            if (judgment == null) {
+                return responseUtil.getNotFoundResponse(uid);
+            }
+            judgment = judgmentService.downloadJudgment(judgment.getUid());
             return responseUtil.getSuccessResponse(judgment);
         } catch (Exception e) {
             e.printStackTrace();

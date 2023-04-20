@@ -43,9 +43,6 @@ public class JudgmentResponseDto {
     @JsonProperty("judgment_content")
     private String judgmentContent;
 
-    @JsonProperty("judgment_text")
-    private String judgmentText;
-
     @JsonProperty("date_issued")
     private Date dateIssued;
 
