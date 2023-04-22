@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LikedJudgmentRequestDto {
+public class UserJudgmentRequestDto {
     @JsonAlias("user_uid")
     private String userUid;
 

@@ -11,7 +11,7 @@ import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.judgment.FilterJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.JudgmentErrorRequestDto;
-import uet.kltn.judgment.dto.request.judgment.LikedJudgmentRequestDto;
+import uet.kltn.judgment.dto.request.judgment.UserJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
 import uet.kltn.judgment.dto.response.judgment.JudgmentResponseDto;
 import uet.kltn.judgment.model.Judgment;
@@ -73,6 +73,11 @@ public class JudgmentController extends GenController {
             if (judgment == null) {
                 return responseUtil.getNotFoundResponse(uid);
             }
+            UserJudgmentRequestDto userJudgmentRequestDto = new UserJudgmentRequestDto(userPrincipal.getId(), uid);
+            if (judgmentService.historyJudgment(userJudgmentRequestDto))
+                System.out.println("Thêm vào lịch sử xem thành công");
+            else
+                System.out.println("Thêm vào lịch sử xem thất bại");
             judgment = judgmentService.viewJudgmentDetail(judgment.getUid());
             return responseUtil.getSuccessResponse(judgment);
         } catch (Exception e) {
@@ -139,7 +144,7 @@ public class JudgmentController extends GenController {
     @PostMapping("/liked")
     public ResponseEntity<?> likedJudgment(@CurrentUser UserPrincipal userPrincipal,
                                            Authentication authentication,
-                                           @RequestBody LikedJudgmentRequestDto likedJudgmentRequestDto){
+                                           @RequestBody UserJudgmentRequestDto likedJudgmentRequestDto){
         try {
             if (userPrincipal == null || !userPrincipal.getId().equals(likedJudgmentRequestDto.getUserUid())) {
                 return responseUtil.getForbiddenResponse();

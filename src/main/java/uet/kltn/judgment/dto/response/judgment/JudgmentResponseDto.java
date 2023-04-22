@@ -66,4 +66,7 @@ public class JudgmentResponseDto {
 
     @JsonProperty("count_download")
     private Integer countDownload;
+
+    @JsonProperty("precedent")
+    private Integer precedent;
 }

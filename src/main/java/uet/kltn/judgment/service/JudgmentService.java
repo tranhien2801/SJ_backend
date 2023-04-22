@@ -13,11 +13,15 @@ import uet.kltn.judgment.constant.Vote;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.judgment.FilterJudgmentRequestDto;
-import uet.kltn.judgment.dto.request.judgment.LikedJudgmentRequestDto;
+import uet.kltn.judgment.dto.request.judgment.UserJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
 import uet.kltn.judgment.dto.response.judgment.JudgmentResponseDto;
+import uet.kltn.judgment.model.History;
 import uet.kltn.judgment.model.Judgment;
+import uet.kltn.judgment.model.JudgmentLiked;
 import uet.kltn.judgment.model.User;
+import uet.kltn.judgment.respository.HistoryRepository;
+import uet.kltn.judgment.respository.JudgmentLikedRepository;
 import uet.kltn.judgment.respository.JudgmentRepository;
 import uet.kltn.judgment.respository.UserRepository;
 
@@ -38,6 +42,12 @@ public class JudgmentService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private HistoryRepository historyRepository;
+
+    @Autowired
+    private JudgmentLikedRepository judgmentLikedRepository;
+
 
     public Judgment updateJudgment(Judgment currentJudgment, UpdateJudgmentRequestDto updateJudgmentRequestDto) {
         currentJudgment.update(updateJudgmentRequestDto);
@@ -52,9 +62,16 @@ public class JudgmentService {
     public JudgmentResponseDto getJudgmentResponseDtoByUid(String uid) {
         if (uid == null) return null;
         Judgment judgment =  judgmentRepository.findByUid(uid);
+        String userUid = null;
+        if (judgment.getUsers().size() != 0) {
+            User user = judgment.getUsers().stream().findFirst().orElseThrow();
+            if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.ACTIVE.getId())) {
+                userUid = user.getUid();
+            }
+        }
         return new JudgmentResponseDto(
                 judgment.getUid(),
-                judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
+                userUid,
                 judgment.getJudgmentNumber(),
                 judgment.getJudgmentName(),
                 judgment.getTypeDocument(),
@@ -70,7 +87,8 @@ public class JudgmentService {
                 judgment.getPdfViewer(),
                 judgment.getCountVote(),
                 judgment.getCountEyes(),
-                judgment.getCountDownload());
+                judgment.getCountDownload(),
+                judgment.getPrecedent());
     }
 
     public List<Judgment> getJudgmentByUids(List<String> uids) {
@@ -81,7 +99,7 @@ public class JudgmentService {
         try {
             Page<Judgment> judgmentPage;
             if (filterJudgmentRequestDto == null || filterJudgmentRequestDto.isEmpty()) {
-                judgmentPage = judgmentRepository.findAllByStateOrderByDateIssued(expressionDto.getPageable(), State.ACTIVE.getId());
+                judgmentPage = judgmentRepository.findAllByStateOrderByDateIssuedDesc(expressionDto.getPageable(), State.ACTIVE.getId());
             } else {
                 Date dateFrom = (filterJudgmentRequestDto.getDateFrom() != null) ? filterJudgmentRequestDto.getDateFrom() : Date.valueOf("2022-11-01");
                 Date dateTo = filterJudgmentRequestDto.getDateTo() != null ? filterJudgmentRequestDto.getDateTo() : Date.valueOf("2022-11-30");
@@ -116,10 +134,17 @@ public class JudgmentService {
             List<Judgment> judgments = judgmentPage.getContent();
             List<JudgmentResponseDto> judgmentResponseDtos = new ArrayList<>();
             judgments.forEach(judgment -> {
+                String userUid = null;
+                if (judgment.getUsers().size() != 0) {
+                    User user = judgment.getUsers().stream().findFirst().orElseThrow();
+                    if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.ACTIVE.getId())) {
+                        userUid = user.getUid();
+                    }
+                }
                 judgmentResponseDtos.add(
                         new JudgmentResponseDto(
                                 judgment.getUid(),
-                                judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
+                                userUid,
                                 judgment.getJudgmentNumber(),
                                 judgment.getJudgmentName(),
                                 judgment.getTypeDocument(),
@@ -135,7 +160,8 @@ public class JudgmentService {
                                 judgment.getPdfViewer(),
                                 judgment.getCountVote(),
                                 judgment.getCountEyes(),
-                                judgment.getCountDownload()));
+                                judgment.getCountDownload(),
+                                judgment.getPrecedent()));
             });
             return new PageDto(judgmentResponseDtos, expressionDto.getPageable().getPageSize(), judgmentPage.getTotalElements(), expressionDto.getPage());
         } catch (Exception exception) {
@@ -156,31 +182,63 @@ public class JudgmentService {
         return judgmentRepository.findJudgmentLevels();
     }
 
-    public boolean userLikedJudgment(LikedJudgmentRequestDto likedJudgmentRequestDto) {
+    public boolean historyJudgment(UserJudgmentRequestDto userJudgmentRequestDto) {
+        User user = userRepository.findByUid(userJudgmentRequestDto.getUserUid());
+        if (user == null) return false;
+        Judgment judgment = judgmentRepository.findByUid(userJudgmentRequestDto.getJudgmentUid());
+        if (judgment == null) return false;
+        try {
+            if (!historyRepository.existsHistoriesByJudgmentAndUser(judgment, user)) {
+                History history = new History(user, judgment);
+                historyRepository.save(history);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean userLikedJudgment(UserJudgmentRequestDto likedJudgmentRequestDto) {
         User user = userRepository.findByUid(likedJudgmentRequestDto.getUserUid());
         if (user == null) return false;
         Judgment judgment = judgmentRepository.findByUid(likedJudgmentRequestDto.getJudgmentUid());
         if (judgment == null) return false;
         try {
-            Set<Judgment> judgmentSet = user.getJudgments();
-            Set<Judgment> newJudgments = new HashSet<>();
-            boolean liked = false;
-            for(Judgment judgment1 : judgmentSet) {
-                if (judgment1.getUid().equals(judgment.getUid())) {
-                    judgmentSet.remove(judgment);
-                    liked = true;
-                } else {
-                    newJudgments.add(judgment1);
-                }
-            }
-            if (!liked) {
-                judgmentSet.add(judgment);
+            JudgmentLiked judgmentLiked;
+            if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.ACTIVE.getId())) {
+                judgmentLiked = judgmentLikedRepository.findByUserAndJudgmentAndState(user, judgment, State.ACTIVE.getId());
+                judgmentLiked.setState(State.DELETE.getId());
+                judgmentLiked.setModified(LocalDateTime.now());
+            } else if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.DELETE.getId())) {
+                judgmentLiked = judgmentLikedRepository.findByUserAndJudgmentAndState(user, judgment, State.DELETE.getId());
+                judgmentLiked.setState(State.ACTIVE.getId());
+                judgmentLiked.setModified(LocalDateTime.now());
             } else {
-                judgmentSet = newJudgments;
+                System.out.println("Thêm bản ghi");
+                judgmentLiked = new JudgmentLiked(user, judgment);
             }
-            System.out.println(judgmentSet.size());
-            user.setJudgments(judgmentSet);
-            userRepository.save(user);
+            judgmentLikedRepository.save(judgmentLiked);
+
+//            Set<Judgment> judgmentSet = user.getJudgments();
+//            Set<Judgment> newJudgments = new HashSet<>();
+//            boolean liked = false;
+//            for(Judgment judgment1 : judgmentSet) {
+//                if (judgment1.getUid().equals(judgment.getUid())) {
+//                    judgmentSet.remove(judgment);
+//                    liked = true;
+//                } else {
+//                    newJudgments.add(judgment1);
+//                }
+//            }
+//            if (!liked) {
+//                judgmentSet.add(judgment);
+//            } else {
+//                judgmentSet = newJudgments;
+//            }
+//            System.out.println(judgmentSet.size());
+//            user.setJudgments(judgmentSet);
+//            userRepository.save(user);
         } catch (Exception exception) {
             exception.printStackTrace();
             return false;
@@ -193,9 +251,16 @@ public class JudgmentService {
             Judgment judgment = judgmentRepository.findByUid(uid);
             judgment.setCountEyes(judgment.getCountEyes()+1);
             judgmentRepository.save(judgment);
+            String userUid = null;
+            if (judgment.getUsers().size() != 0) {
+                User user = judgment.getUsers().stream().findFirst().orElseThrow();
+                if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.ACTIVE.getId())) {
+                    userUid = user.getUid();
+                }
+            }
             return new JudgmentResponseDto(
                     judgment.getUid(),
-                    judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
+                    userUid,
                     judgment.getJudgmentNumber(),
                     judgment.getJudgmentName(),
                     judgment.getTypeDocument(),
@@ -211,7 +276,8 @@ public class JudgmentService {
                     judgment.getPdfViewer(),
                     judgment.getCountVote(),
                     judgment.getCountEyes(),
-                    judgment.getCountDownload());
+                    judgment.getCountDownload(),
+                    judgment.getPrecedent());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -223,9 +289,16 @@ public class JudgmentService {
             Judgment judgment = judgmentRepository.findByUid(uid);
             judgment.setCountDownload(judgment.getCountDownload()+1);
             judgmentRepository.save(judgment);
+            String userUid = null;
+            if (judgment.getUsers().size() != 0) {
+                User user = judgment.getUsers().stream().findFirst().orElseThrow();
+                if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.ACTIVE.getId())) {
+                    userUid = user.getUid();
+                }
+            }
             return new JudgmentResponseDto(
                     judgment.getUid(),
-                    judgment.getUsers().size() != 0 ? judgment.getUsers().stream().findFirst().orElseThrow().getUid() : null,
+                    userUid,
                     judgment.getJudgmentNumber(),
                     judgment.getJudgmentName(),
                     judgment.getTypeDocument(),
@@ -241,7 +314,8 @@ public class JudgmentService {
                     judgment.getPdfViewer(),
                     judgment.getCountVote(),
                     judgment.getCountEyes(),
-                    judgment.getCountDownload());
+                    judgment.getCountDownload(),
+                    judgment.getPrecedent());
         } catch (Exception e) {
             e.printStackTrace();
         }

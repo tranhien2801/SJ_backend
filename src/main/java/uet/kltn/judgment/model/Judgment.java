@@ -45,8 +45,8 @@ public class Judgment extends BaseEntity {
         @Column(name = "`judgment_content`", columnDefinition = "LONGTEXT", nullable = false)
         private String judgmentContent;
 
-        @Column(name = "`judgment_text`", columnDefinition = "LONGTEXT", nullable = false)
-        private String judgmentText;
+//        @Column(name = "`judgment_text`", columnDefinition = "LONGTEXT", nullable = false)
+//        private String judgmentText;
 
         @Column(name = "`date_issued`", columnDefinition = "DATE", nullable = false)
         private Date dateIssued;
@@ -98,8 +98,8 @@ public class Judgment extends BaseEntity {
                         this.judgmentName = updateJudgmentRequestDto.getJudgmentName();
                 if (updateJudgmentRequestDto.getJudgmentContent() != null)
                         this.judgmentContent = updateJudgmentRequestDto.getJudgmentContent();
-                if (updateJudgmentRequestDto.getJudgmentText() != null)
-                        this.judgmentText = updateJudgmentRequestDto.getJudgmentText();
+//                if (updateJudgmentRequestDto.getJudgmentText() != null)
+//                        this.judgmentText = updateJudgmentRequestDto.getJudgmentText();
                 if (updateJudgmentRequestDto.getUrl() != null)
                         this.url = updateJudgmentRequestDto.getUrl();
                 if (updateJudgmentRequestDto.getFileDownload() != null)

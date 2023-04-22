@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uet.kltn.judgment.model.Judgment;
+import uet.kltn.judgment.model.User;
 
 import java.sql.Date;
 import java.util.List;
@@ -24,7 +25,7 @@ public interface JudgmentRepository extends JpaRepository<Judgment, String> {
 
     Page<Judgment> findAllByState(Pageable pageable, int state);
 
-    Page<Judgment> findAllByStateOrderByDateIssued(Pageable pageable, int state);
+    Page<Judgment> findAllByStateOrderByDateIssuedDesc(Pageable pageable, int state);
 
     List<Judgment> findAllByState(int state);
 
@@ -40,7 +41,7 @@ public interface JudgmentRepository extends JpaRepository<Judgment, String> {
             "AND j.dateIssued >= :dateFrom " +
             "AND j.dateIssued <= :dateTo " +
             "AND j.countVote >= :vote " +
-            "ORDER BY j.dateIssued ASC ")
+            "ORDER BY j.dateIssued DESC ")
     Page<Judgment> findByFilterAndState(Pageable pageable, String judgmentNumber, String courtLevel, String judgmentLevel, String typeDocument, String caseType, Date dateFrom, Date dateTo, Integer vote, int state);
 
     @Query("SELECT j FROM Judgment j " +
@@ -56,7 +57,7 @@ public interface JudgmentRepository extends JpaRepository<Judgment, String> {
             "AND j.dateIssued <= :dateTo " +
             "AND j.countVote >= :vote " +
             "AND j.precedent = :precedent " +
-            "ORDER BY j.dateIssued ASC ")
+            "ORDER BY j.dateIssued DESC ")
     Page<Judgment> findByFilterAndStateAndPrecedent(Pageable pageable, String judgmentNumber, String courtLevel, String judgmentLevel, String typeDocument, String caseType, Date dateFrom, Date dateTo, Integer vote, Integer precedent, int state);
 
     @Query("SELECT j.judgmentLevel FROM Judgment j GROUP BY j.judgmentLevel")
