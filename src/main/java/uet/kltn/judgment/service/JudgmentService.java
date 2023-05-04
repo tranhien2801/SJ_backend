@@ -7,14 +7,13 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import uet.kltn.judgment.constant.Precedent;
-import uet.kltn.judgment.constant.State;
-import uet.kltn.judgment.constant.Vote;
+import uet.kltn.judgment.constant.*;
 import uet.kltn.judgment.dto.PageDto;
 import uet.kltn.judgment.dto.common.ExpressionDto;
 import uet.kltn.judgment.dto.request.judgment.FilterJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UserJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
+import uet.kltn.judgment.dto.response.judgment.DataResponseDto;
 import uet.kltn.judgment.dto.response.judgment.JudgmentResponseDto;
 import uet.kltn.judgment.model.History;
 import uet.kltn.judgment.model.Judgment;
@@ -80,6 +79,8 @@ public class JudgmentService {
                 judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
                 judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
                 judgment.getJudgmentContent(),
+//                judgment.getJudgmentText(),
+                judgment.getJudgmentSummarization(),
                 judgment.getDateIssued(),
                 judgment.getDateUpload(),
                 judgment.getUrl(),
@@ -153,6 +154,8 @@ public class JudgmentService {
                                 judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
                                 judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
                                 judgment.getJudgmentContent(),
+//                                judgment.getJudgmentText(),
+                                judgment.getJudgmentSummarization(),
                                 judgment.getDateIssued(),
                                 judgment.getDateUpload(),
                                 judgment.getUrl(),
@@ -208,37 +211,16 @@ public class JudgmentService {
             JudgmentLiked judgmentLiked;
             if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.ACTIVE.getId())) {
                 judgmentLiked = judgmentLikedRepository.findByUserAndJudgmentAndState(user, judgment, State.ACTIVE.getId());
-                judgmentLiked.setState(State.DELETE.getId());
+                judgmentLiked.setState(State.INACTIVE.getId());
                 judgmentLiked.setModified(LocalDateTime.now());
-            } else if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.DELETE.getId())) {
-                judgmentLiked = judgmentLikedRepository.findByUserAndJudgmentAndState(user, judgment, State.DELETE.getId());
+            } else if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.INACTIVE.getId())) {
+                judgmentLiked = judgmentLikedRepository.findByUserAndJudgmentAndState(user, judgment, State.INACTIVE.getId());
                 judgmentLiked.setState(State.ACTIVE.getId());
                 judgmentLiked.setModified(LocalDateTime.now());
             } else {
-                System.out.println("Thêm bản ghi");
                 judgmentLiked = new JudgmentLiked(user, judgment);
             }
             judgmentLikedRepository.save(judgmentLiked);
-
-//            Set<Judgment> judgmentSet = user.getJudgments();
-//            Set<Judgment> newJudgments = new HashSet<>();
-//            boolean liked = false;
-//            for(Judgment judgment1 : judgmentSet) {
-//                if (judgment1.getUid().equals(judgment.getUid())) {
-//                    judgmentSet.remove(judgment);
-//                    liked = true;
-//                } else {
-//                    newJudgments.add(judgment1);
-//                }
-//            }
-//            if (!liked) {
-//                judgmentSet.add(judgment);
-//            } else {
-//                judgmentSet = newJudgments;
-//            }
-//            System.out.println(judgmentSet.size());
-//            user.setJudgments(judgmentSet);
-//            userRepository.save(user);
         } catch (Exception exception) {
             exception.printStackTrace();
             return false;
@@ -269,6 +251,8 @@ public class JudgmentService {
                     judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
                     judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
                     judgment.getJudgmentContent(),
+//                    judgment.getJudgmentText(),
+                    judgment.getJudgmentSummarization(),
                     judgment.getDateIssued(),
                     judgment.getDateUpload(),
                     judgment.getUrl(),
@@ -307,6 +291,8 @@ public class JudgmentService {
                     judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
                     judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
                     judgment.getJudgmentContent(),
+//                    judgment.getJudgmentText(),
+                    judgment.getJudgmentSummarization(),
                     judgment.getDateIssued(),
                     judgment.getDateUpload(),
                     judgment.getUrl(),
@@ -322,4 +308,62 @@ public class JudgmentService {
         return null;
     }
 
+    public JudgmentResponseDto voteJudgment(String judgmentUid) {
+        try {
+            Judgment judgment = judgmentRepository.findByUid(judgmentUid);
+            if (judgment == null)   return null;
+            judgment.setCountVote(judgment.getCountVote()+1);
+            judgmentRepository.save(judgment);
+            String userUid = null;
+            if (judgment.getUsers().size() != 0) {
+                User user = judgment.getUsers().stream().findFirst().orElseThrow();
+                if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment, user, State.ACTIVE.getId())) {
+                    userUid = user.getUid();
+                }
+            }
+            return new JudgmentResponseDto(
+                    judgment.getUid(),
+                    userUid,
+                    judgment.getJudgmentNumber(),
+                    judgment.getJudgmentName(),
+                    judgment.getTypeDocument(),
+                    judgment.getJudgmentLevel(),
+                    judgment.getCourt() != null ? judgment.getCourt().getCourtName() : null,
+                    judgment.getACase() != null ? judgment.getACase().getCaseName() : null,
+                    judgment.getACase().getCaseType() != null ? judgment.getACase().getCaseType() : null,
+                    judgment.getJudgmentContent(),
+//                    judgment.getJudgmentText(),
+                    judgment.getJudgmentSummarization(),
+                    judgment.getDateIssued(),
+                    judgment.getDateUpload(),
+                    judgment.getUrl(),
+                    judgment.getFileDownload(),
+                    judgment.getPdfViewer(),
+                    judgment.getCountVote(),
+                    judgment.getCountEyes(),
+                    judgment.getCountDownload(),
+                    judgment.getPrecedent());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public DataResponseDto getDataForDashBoard() {
+        try {
+            Integer totalJudgments = judgmentRepository.countAllByState(State.ACTIVE.getId());
+            Integer totalUsers = userRepository.countAllBy();
+            Integer totalManagers = userRepository.countAllByLevelAndRole(Level.LEVEL_ENTERPRISE.getId(), RoleUser.ROLE_MANAGER.getId());
+            Date dateLastest = judgmentRepository.minDateIssued();
+            Date dateNewest = judgmentRepository.maxDateIssued();
+            return new DataResponseDto(totalJudgments, totalUsers, totalManagers, dateLastest, dateNewest);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Set<?> countByCaseType() {
+        return judgmentRepository.countByCaseType();
+    }
 }

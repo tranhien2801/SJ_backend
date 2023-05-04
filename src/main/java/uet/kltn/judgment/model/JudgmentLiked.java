@@ -17,6 +17,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Entity
 @Table(name = "judgment_liked")
+@Where(clause = "state != 3")
 public class JudgmentLiked extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "user_uid")

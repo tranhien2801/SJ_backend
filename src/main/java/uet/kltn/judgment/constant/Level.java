@@ -4,8 +4,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public enum Level {
-    LEVEL_PERSONAL(0, "Cá nhân"),
-    LEVEL_ENTERPRISE(1, "Doanh nghiệp");
+    LEVEL_PERSONAL(1, "Cá nhân"),
+    LEVEL_ENTERPRISE(0, "Doanh nghiệp");
 
 
     private int id;

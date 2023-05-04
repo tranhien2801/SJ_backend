@@ -2,6 +2,7 @@ package uet.kltn.judgment.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.python.antlr.op.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import uet.kltn.judgment.dto.request.judgment.FilterJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.JudgmentErrorRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UserJudgmentRequestDto;
 import uet.kltn.judgment.dto.request.judgment.UpdateJudgmentRequestDto;
+import uet.kltn.judgment.dto.response.judgment.DataResponseDto;
 import uet.kltn.judgment.dto.response.judgment.JudgmentResponseDto;
 import uet.kltn.judgment.model.Judgment;
 import uet.kltn.judgment.model.JudgmentError;
@@ -95,11 +97,29 @@ public class JudgmentController extends GenController {
             if (userPrincipal == null) {
                 return responseUtil.getForbiddenResponse();
             }
-            JudgmentResponseDto judgment = judgmentService.getJudgmentResponseDtoByUid(uid);
+            JudgmentResponseDto judgment = judgmentService.downloadJudgment(uid);
             if (judgment == null) {
                 return responseUtil.getNotFoundResponse(uid);
             }
-            judgment = judgmentService.downloadJudgment(judgment.getUid());
+            return responseUtil.getSuccessResponse(judgment);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
+    @GetMapping(path = "/{uid}/vote")
+    public ResponseEntity<?> voteJudgment(@PathVariable(value = "uid") String uid,
+                                              @CurrentUser UserPrincipal userPrincipal,
+                                              Authentication authentication) {
+        try {
+            if (userPrincipal == null) {
+                return responseUtil.getForbiddenResponse();
+            }
+            JudgmentResponseDto judgment = judgmentService.voteJudgment(uid);
+            if (judgment == null) {
+                return responseUtil.getNotFoundResponse(uid);
+            }
             return responseUtil.getSuccessResponse(judgment);
         } catch (Exception e) {
             e.printStackTrace();
@@ -220,6 +240,28 @@ public class JudgmentController extends GenController {
             }
             return responseUtil.getSuccessResponse(judgmentErrorRequestDto);
         } catch (Exception e) {
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
+    @GetMapping("/data-chart")
+    public ResponseEntity<?> getDataForChart() {
+        try {
+            Set<?> response = judgmentService.countByCaseType();
+            return responseUtil.getSuccessResponse(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtil.getInternalServerErrorResponse();
+        }
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> getTotalJudgments(){
+        try {
+            DataResponseDto dataResponseDto = judgmentService.getDataForDashBoard();
+            return responseUtil.getSuccessResponse(dataResponseDto);
+        } catch (Exception e) {
+            e.printStackTrace();
             return responseUtil.getInternalServerErrorResponse();
         }
     }

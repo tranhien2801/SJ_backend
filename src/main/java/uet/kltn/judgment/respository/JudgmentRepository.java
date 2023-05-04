@@ -1,6 +1,6 @@
 package uet.kltn.judgment.respository;
 
-import jnr.ffi.annotations.In;
+import org.python.antlr.op.In;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -62,6 +62,18 @@ public interface JudgmentRepository extends JpaRepository<Judgment, String> {
 
     @Query("SELECT j.judgmentLevel FROM Judgment j GROUP BY j.judgmentLevel")
     Set<String> findJudgmentLevels();
+
+    @Query(value = "SELECT COUNT(*) FROM Judgment j " +
+            "LEFT JOIN j.aCase jc GROUP BY jc.caseType")
+    Set<?> countByCaseType();
+
+    Integer countAllByState(int state);
+
+    @Query("SELECT MAX(j.dateIssued) FROM Judgment j")
+    Date maxDateIssued();
+
+    @Query("SELECT MIN(j.dateIssued) FROM Judgment j")
+    Date minDateIssued();
 
 
 }

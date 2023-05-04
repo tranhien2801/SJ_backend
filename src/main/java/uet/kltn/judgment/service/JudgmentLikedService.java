@@ -79,10 +79,14 @@ public class JudgmentLikedService {
             }
             List<JudgmentResponseDto> judgmentResponseDtos = new ArrayList<>();
             judgmentPage.forEach(judgment -> {
+                String userLikedUid = null;
+                if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment.getJudgment(), judgment.getUser(), State.ACTIVE.getId())) {
+                    userLikedUid = user.getUid();
+                }
                 judgmentResponseDtos.add(
                         new JudgmentResponseDto(
                                 judgment.getJudgment().getUid(),
-                                judgment.getUser().getUid(),
+                                userLikedUid,
                                 judgment.getJudgment().getJudgmentNumber(),
                                 judgment.getJudgment().getJudgmentName(),
                                 judgment.getJudgment().getTypeDocument(),
@@ -91,6 +95,8 @@ public class JudgmentLikedService {
                                 judgment.getJudgment().getACase() != null ? judgment.getJudgment().getACase().getCaseName() : null,
                                 judgment.getJudgment().getACase().getCaseType() != null ? judgment.getJudgment().getACase().getCaseType() : null,
                                 judgment.getJudgment().getJudgmentContent(),
+//                                judgment.getJudgment().getJudgmentText(),
+                                judgment.getJudgment().getJudgmentSummarization(),
                                 judgment.getJudgment().getDateIssued(),
                                 judgment.getJudgment().getDateUpload(),
                                 judgment.getJudgment().getUrl(),

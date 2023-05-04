@@ -48,6 +48,9 @@ public class Judgment extends BaseEntity {
 //        @Column(name = "`judgment_text`", columnDefinition = "LONGTEXT", nullable = false)
 //        private String judgmentText;
 
+        @Column(name = "`judgment_summarization`", columnDefinition = "LONGTEXT", nullable = true)
+        private String judgmentSummarization;
+
         @Column(name = "`date_issued`", columnDefinition = "DATE", nullable = false)
         private Date dateIssued;
 

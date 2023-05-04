@@ -288,32 +288,6 @@ public class UserService {
         return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
     }
 
-//    public PageDto getUsersByFilter(ExpressionDto expressionDto, int role) {
-//        List<Integer> roleList = new ArrayList<>();
-//        for (int i = role; i <= 4 ; i++) {
-//            roleList.add(i);
-//        }
-//        Page<User> userPage = userRepository.findUsersByStateAndPowerIn(expressionDto.getPageable(), State.ACTIVE.getId(), roleList);
-//        List<User> users = userPage.getContent();
-//        List<UserResponseDto> userResponseDtos = new ArrayList<>();
-//        users.forEach(user -> {
-//            userResponseDtos.add(
-//                    new UserResponseDto(
-//                            user.getUid(),
-//                            user.getName(),
-//                            user.getEmail(),
-//                            user.getPhoneNumber(),
-//                            user.getDescription(),
-//                            user.getAvatar(),
-//                            user.getGender(),
-//                            user.getBirthday(),
-//                            user.getPower(),
-//                            user.getLastLogin()));
-//        });
-//
-//        return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
-//    }
-
     public void deleteListUser(List<User> users) {
         users.forEach(user -> {
             user.setState(State.DELETE.getId());

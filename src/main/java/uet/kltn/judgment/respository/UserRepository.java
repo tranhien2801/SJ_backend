@@ -42,6 +42,10 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Page<User> findByLevelAndRole(Pageable pageable, int level, int role);
 
-    User findUserByUidAndUsageTimeAndState(String uid, int usgaeTime, int state);
+    User findUserByUidAndUsageTimeAndState(String uid, int usageTime, int state);
+
+    Integer countAllBy();
+
+    Integer countAllByLevelAndRole(int level, int role);
 
 }

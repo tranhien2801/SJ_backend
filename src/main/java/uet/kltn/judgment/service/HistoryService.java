@@ -18,6 +18,7 @@ import uet.kltn.judgment.model.History;
 import uet.kltn.judgment.model.Judgment;
 import uet.kltn.judgment.model.User;
 import uet.kltn.judgment.respository.HistoryRepository;
+import uet.kltn.judgment.respository.JudgmentLikedRepository;
 import uet.kltn.judgment.respository.UserRepository;
 
 import java.sql.Date;
@@ -35,6 +36,9 @@ public class HistoryService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JudgmentLikedRepository judgmentLikedRepository;
 
     public PageDto getJudgmentsViewed(ExpressionDto expressionDto, String userUid, FilterJudgmentRequestDto filterJudgmentRequestDto) {
         try {
@@ -79,10 +83,14 @@ public class HistoryService {
             }
             List<JudgmentResponseDto> judgmentResponseDtos = new ArrayList<>();
             judgmentPage.forEach(judgment -> {
+                String userLikedUid = null;
+                if (judgmentLikedRepository.existsJudgmentLikedByJudgmentAndUserAndState(judgment.getJudgment(), judgment.getUser(), State.ACTIVE.getId())) {
+                    userLikedUid = user.getUid();
+                }
                 judgmentResponseDtos.add(
                         new JudgmentResponseDto(
                                 judgment.getJudgment().getUid(),
-                                judgment.getUser().getUid(),
+                                userLikedUid,
                                 judgment.getJudgment().getJudgmentNumber(),
                                 judgment.getJudgment().getJudgmentName(),
                                 judgment.getJudgment().getTypeDocument(),
@@ -91,6 +99,8 @@ public class HistoryService {
                                 judgment.getJudgment().getACase() != null ? judgment.getJudgment().getACase().getCaseName() : null,
                                 judgment.getJudgment().getACase().getCaseType() != null ? judgment.getJudgment().getACase().getCaseType() : null,
                                 judgment.getJudgment().getJudgmentContent(),
+//                                judgment.getJudgment().getJudgmentText(),
+                                judgment.getJudgment().getJudgmentSummarization(),
                                 judgment.getJudgment().getDateIssued(),
                                 judgment.getJudgment().getDateUpload(),
                                 judgment.getJudgment().getUrl(),
