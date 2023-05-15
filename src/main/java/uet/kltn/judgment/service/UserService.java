@@ -75,6 +75,9 @@ public class UserService {
             Unit unit = unitRespository.findByUnitNameAndState(signUpRequestDto.getUnit(), State.ACTIVE.getId());
             user.setUnit(unit);
         }
+        if (signUpRequestDto.getRole() != null) {
+            user.setRole(RoleUser.getByName(signUpRequestDto.getRole()).getId());
+        }
         user.setState(State.INACTIVE.getId());
         user = userRepository.save(user);
         return user;
@@ -82,65 +85,51 @@ public class UserService {
     }
 
     public User updateUser(User currentUser, UpdateUserRequestDto updateUserRequestDto) {
-
-        if (updateUserRequestDto.getName() != null && !currentUser.getName().equals(updateUserRequestDto.getName())) {
+        if (updateUserRequestDto.getName() != null && (currentUser.getName() == null || (currentUser.getName() != null && !currentUser.getName().equals(updateUserRequestDto.getName())))) {
             currentUser.setName(updateUserRequestDto.getName());
         }
-
         if (updateUserRequestDto.getEmail() != null && !currentUser.getEmail().equals(updateUserRequestDto.getEmail())) {
             currentUser.setEmail(updateUserRequestDto.getEmail());
         }
-
-        if (updateUserRequestDto.getLevel() != null && Level.getById(currentUser.getLevel()).getName().equals(updateUserRequestDto.getLevel())) {
+        if (updateUserRequestDto.getLevel() != null && (currentUser.getLevel() == null || (currentUser.getLevel() != null && !Level.getById(currentUser.getLevel()).getName().equals(updateUserRequestDto.getLevel())))) {
             currentUser.setLevel(Level.getByName(updateUserRequestDto.getLevel()).getId());
         }
-
-        if (updateUserRequestDto.getState() != null && State.getById(currentUser.getState()).equals(updateUserRequestDto.getState())) {
+        if (updateUserRequestDto.getState() != null && !State.getById(currentUser.getState()).equals(updateUserRequestDto.getState())) {
             currentUser.setState(State.getByName(updateUserRequestDto.getState()).getId());
         }
-
-        if (updateUserRequestDto.getUsageTime() != null && UsageTime.getById(currentUser.getUsageTime()).equals(updateUserRequestDto.getUsageTime())) {
+        if (updateUserRequestDto.getUsageTime() != null && (currentUser.getUsageTime() == null || (currentUser.getUsageTime() != null && !UsageTime.getById(currentUser.getUsageTime()).equals(updateUserRequestDto.getUsageTime())))) {
             currentUser.setUsageTime(UsageTime.getByName(updateUserRequestDto.getUsageTime()).getId());
         }
-
-        if (updateUserRequestDto.getFunctions() != null && !currentUser.getFunctions().equals(updateUserRequestDto.getFunctions())) {
+        if (updateUserRequestDto.getFunctions() != null && (currentUser.getFunctions() == null || (currentUser.getFunctions() != null && !currentUser.getFunctions().equals(updateUserRequestDto.getFunctions())))) {
             Set<Function> functions = functionRespository.findByFunctionNameInAndState(updateUserRequestDto.getFunctions(), State.ACTIVE.getId());
             currentUser.setFunctions(functions);
         }
-
-        if (updateUserRequestDto.getCaseTypes() != null && !currentUser.getCaseTypes().equals(updateUserRequestDto.getCaseTypes())) {
+        if (updateUserRequestDto.getCaseTypes() != null && (currentUser.getCaseTypes() == null || (currentUser.getCaseTypes() != null && !currentUser.getCaseTypes().equals(updateUserRequestDto.getCaseTypes())))) {
             Set<CaseType> caseTypes = caseTypeRespository.findByCaseTypeNameInAndState(updateUserRequestDto.getCaseTypes(), State.ACTIVE.getId());
             currentUser.setCaseTypes(caseTypes);
         }
-
-        if (updateUserRequestDto.getPhoneNumber() != null && !currentUser.getPhoneNumber().equals(updateUserRequestDto.getPhoneNumber())) {
+        if (updateUserRequestDto.getPhoneNumber() != null && ( currentUser.getPhoneNumber() == null || (currentUser.getPhoneNumber() != null && !currentUser.getPhoneNumber().equals(updateUserRequestDto.getPhoneNumber())))) {
             currentUser.setPhoneNumber(updateUserRequestDto.getPhoneNumber());
         }
-
-        if (updateUserRequestDto.getRole() != null && RoleUser.getById(currentUser.getRole()).equals(updateUserRequestDto.getRole())) {
+        if (updateUserRequestDto.getRole() != null && (currentUser.getRole() == null || (currentUser.getRole() != null && !RoleUser.getById(currentUser.getRole()).equals(updateUserRequestDto.getRole())))) {
             currentUser.setRole(RoleUser.getByName(updateUserRequestDto.getRole()).getId());
         }
-
-        if (updateUserRequestDto.getWork() != null && !currentUser.getWork().equals(updateUserRequestDto.getWork())) {
+        if (updateUserRequestDto.getWork() != null && (currentUser.getWork() == null || (currentUser.getWork() != null && !currentUser.getWork().equals(updateUserRequestDto.getWork())))) {
             Work work = workRespository.findByWorkNameAndState(updateUserRequestDto.getWork(), State.ACTIVE.getId());
             if (work == null) work = new Work(Utils.uuid(), updateUserRequestDto.getWork());
             workRespository.save(work);
             currentUser.setWork(work);
         }
-
-        if (updateUserRequestDto.getUnit() != null && !currentUser.getUnit().equals(updateUserRequestDto.getUnit())) {
+        if (updateUserRequestDto.getUnit() != null && (currentUser.getUnit() == null || (currentUser.getUnit() != null && !currentUser.getUnit().equals(updateUserRequestDto.getUnit())))) {
             Unit unit = unitRespository.findByUnitNameAndState(updateUserRequestDto.getUnit(), State.ACTIVE.getId());
             currentUser.setUnit(unit);
         }
-
-        if (updateUserRequestDto.getNumberEmployee() != null && currentUser.getNumberEmployee() != updateUserRequestDto.getNumberEmployee()) {
+        if (updateUserRequestDto.getNumberEmployee() != null && (currentUser.getNumberEmployee() == null || (currentUser.getNumberEmployee() != null && currentUser.getNumberEmployee() != updateUserRequestDto.getNumberEmployee()))) {
             currentUser.setNumberEmployee(updateUserRequestDto.getNumberEmployee());
         }
-
-        if (updateUserRequestDto.getDescription() != null && !currentUser.getDescription().equals(updateUserRequestDto.getDescription())) {
+        if (updateUserRequestDto.getDescription() != null && (currentUser.getDescription() == null || (currentUser.getDescription() != null && !currentUser.getDescription().equals(updateUserRequestDto.getDescription())))) {
             currentUser.setDescription(updateUserRequestDto.getDescription());
         }
-
         userRepository.save(currentUser);
         return currentUser;
     }
@@ -157,11 +146,15 @@ public class UserService {
     }
 
     public User getUserById(String id) {
+        return userRepository.findByUid(id);
+    }
+
+    public User getUserByIdAndState(String id) {
         return userRepository.findUserByUidAndState(id, State.ACTIVE.getId());
     }
 
     public List<User> getUserByIdsAndPowerGreater(List<String> uids, int power) {
-        return userRepository.findUserByUidInAndStateAndPowerGreaterThanEqual(uids, State.ACTIVE.getId(), power);
+        return userRepository.findUserByUidInAndPowerGreaterThanEqual(uids, power);
     }
 
     public User updatePower(User user) {
@@ -176,11 +169,11 @@ public class UserService {
     }
 
     public boolean isUserExistByEmail(String email) {
-        return userRepository.existsUserByEmailAndState(email, State.ACTIVE.getId());
+        return userRepository.existsUserByEmail(email);
     }
 
     public boolean isAnotherUserExistByEmail(String email, String id) {
-        return userRepository.existsUserByEmailAndUidNotAndState(email, id, State.ACTIVE.getId());
+        return userRepository.existsUserByEmailAndUidNot(email, id);
     }
 
     public User resetPassword(String password, User user) {
@@ -221,12 +214,12 @@ public class UserService {
         return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
     }
 
-    public PageDto getAllUser(ExpressionDto expressionDto, int role) {
+    public PageDto getAllUser(ExpressionDto expressionDto, int role, String uid) {
         List<Integer> roleList = new ArrayList<>();
         for (int i = role; i <= 4; i++) {
             roleList.add(i);
         }
-        Page<User> userPage = userRepository.findAllByPowerIn(expressionDto.getPageable(), roleList);
+        Page<User> userPage = userRepository.findAllByPowerInAndUidNot(expressionDto.getPageable(), roleList, uid);
         List<User> users = userPage.getContent();
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
         users.forEach(user -> {
@@ -243,7 +236,7 @@ public class UserService {
                             Power.getById(user.getPower()).getName(),
                             State.getById(user.getState()).getName(),
                             user.getUsageTime() != null ? UsageTime.getById(user.getUsageTime()).getName() : null,
-                            RoleUser.getById(user.getRole()).getName(),
+                            user.getRole() != null ?  RoleUser.getById(user.getRole()).getName() : null,
                             user.getUnit() != null ? user.getUnit().getUnitName() : null,
                             user.getWork() != null ? user.getWork().getWorkName() : null,
                             0,
@@ -256,6 +249,41 @@ public class UserService {
 
         return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
     }
+
+    public PageDto getAllUserByUnit(ExpressionDto expressionDto, String uid) {
+        User manager = userRepository.findByUid(uid);
+        if (manager == null || manager.getUnit() == null)   return null;
+        Page<User> userPage = userRepository.findAllByUnitAndUidNot(expressionDto.getPageable(), manager.getUnit(), uid);
+        List<User> users = userPage.getContent();
+        List<UserResponseDto> userResponseDtos = new ArrayList<>();
+        users.forEach(user -> {
+            userResponseDtos.add(
+                    new UserResponseDto(
+                            user.getUid(),
+                            user.getName(),
+                            user.getEmail(),
+                            user.getPhoneNumber(),
+                            user.getDescription(),
+                            user.getAvatar(),
+                            user.getGender() != null ? Gender.getById(user.getGender()).getName() : null,
+                            user.getBirthday(),
+                            Power.getById(user.getPower()).getName(),
+                            State.getById(user.getState()).getName(),
+                            user.getUsageTime() != null ? UsageTime.getById(user.getUsageTime()).getName() : null,
+                            user.getRole() != null ?  RoleUser.getById(user.getRole()).getName() : null,
+                            user.getUnit() != null ? user.getUnit().getUnitName() : null,
+                            user.getWork() != null ? user.getWork().getWorkName() : null,
+                            0,
+                            user.getCaseTypes().size() != 0 ? user.getCaseTypes().stream().findFirst().orElseThrow().getCaseTypeName() : null,
+                            user.getFunctions().size() != 0 ? user.getFunctions().stream().findFirst().orElseThrow().getFunctionName() : null,
+                            user.getLastLogin(),
+                            user.getLevel() != null ? Level.getById(user.getLevel()).getName() : null
+                    ));
+        });
+
+        return new PageDto(userResponseDtos, expressionDto.getPageable().getPageSize(), userPage.getTotalElements(), expressionDto.getPage());
+    }
+
 
     public PageDto getUserIsEnterpriseManagement(ExpressionDto expressionDto) {
         Page<User> userPage = userRepository.findByLevelAndRole(expressionDto.getPageable(), Level.LEVEL_ENTERPRISE.getId(), RoleUser.ROLE_MANAGER.getId());

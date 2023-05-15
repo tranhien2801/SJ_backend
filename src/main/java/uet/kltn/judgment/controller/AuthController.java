@@ -5,9 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
-import uet.kltn.judgment.constant.Constant;
-import uet.kltn.judgment.constant.DtoField;
-import uet.kltn.judgment.constant.Power;
+import uet.kltn.judgment.constant.*;
 import uet.kltn.judgment.dto.ResponseDto;
 import uet.kltn.judgment.dto.request.auth.AuthDto;
 import uet.kltn.judgment.dto.request.user.SignUpRequestDto;
@@ -109,9 +107,13 @@ public class AuthController extends GenController {
 
             if (Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId() == Power.ADMIN.getId()
                     || Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId() == Power.SYSTEM_ADMIN.getId()) {
-                signUpRequestDto.setPower(Power.MANAGER.getId());
+                if (signUpRequestDto.getLevel() != null && Level.getByName(signUpRequestDto.getLevel()).getId() == Level.LEVEL_ENTERPRISE.getId() && RoleUser.getByName(signUpRequestDto.getRole()).getId() == RoleUser.ROLE_MANAGER.getId()) {
+                    signUpRequestDto.setPower(Power.MANAGER.getName());
+                } else {
+                    signUpRequestDto.setPower(Power.STAFF.getName());
+                }
             } else if (Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId() == Power.MANAGER.getId()) {
-                signUpRequestDto.setPower(Power.STAFF.getId());
+                signUpRequestDto.setPower(Power.STAFF.getName());
             }
 
             User user = userService.createNewUser(signUpRequestDto, isEmailUsername);

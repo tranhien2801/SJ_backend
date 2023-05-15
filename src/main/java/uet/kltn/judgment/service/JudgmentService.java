@@ -352,7 +352,7 @@ public class JudgmentService {
     public DataResponseDto getDataForDashBoard() {
         try {
             Integer totalJudgments = judgmentRepository.countAllByState(State.ACTIVE.getId());
-            Integer totalUsers = userRepository.countAllBy();
+            Integer totalUsers = userRepository.countAllBy() - 1;
             Integer totalManagers = userRepository.countAllByLevelAndRole(Level.LEVEL_ENTERPRISE.getId(), RoleUser.ROLE_MANAGER.getId());
             Date dateLastest = judgmentRepository.minDateIssued();
             Date dateNewest = judgmentRepository.maxDateIssued();

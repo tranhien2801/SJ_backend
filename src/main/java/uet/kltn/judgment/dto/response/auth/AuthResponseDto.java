@@ -15,8 +15,8 @@ public class AuthResponseDto {
     private String accessToken;
     @JsonProperty("user_id")
     private String userId;
-    @JsonProperty("role")
-    private Integer role;
+    @JsonProperty("power")
+    private Integer power;
     @JsonProperty("name")
     private String name;
     @JsonProperty("avatar")

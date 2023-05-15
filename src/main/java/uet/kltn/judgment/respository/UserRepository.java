@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import uet.kltn.judgment.model.Unit;
 import uet.kltn.judgment.model.User;
 
 import java.util.List;
@@ -23,19 +24,23 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     User findUserByEmailAndState(String email, int state);
 
-    Boolean existsUserByEmailAndState(String email, int state);
+    Boolean existsUserByEmail(String email);
 
-    Boolean existsUserByEmailAndUidNotAndState(String email, String uid, int state);
+    Boolean existsUserByEmailAndUidNot(String email, String uid);
 
     User findUserByUidAndState(String uid, int state);
 
-    List<User> findUserByUidInAndStateAndPowerGreaterThanEqual(List<String> ids, int state, int power);
+    List<User> findUserByUidInAndPowerGreaterThanEqual(List<String> ids, int power);
 
     Page<User> findByUidAndState(Pageable pageable, String uid, int state);
 
     Page<User> findAllByStateAndPowerIn(Pageable pageable, int state, List<Integer> listPower);
 
-    Page<User> findAllByPowerIn(Pageable pageable, List<Integer> listPower);
+    Page<User> findAllByPowerIn(Pageable pageable, List<Integer> listPower, String uid);
+
+    Page<User> findAllByPowerInAndUidNot(Pageable pageable, List<Integer> listPower, String uid);
+
+    Page<User> findAllByUnitAndUidNot(Pageable pageable, Unit unit, String uid);
 
 
     Page<User> findByLevelAndRoleAndState(Pageable pageable, int level, int role, int state);

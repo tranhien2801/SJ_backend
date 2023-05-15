@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
-import uet.kltn.judgment.constant.UsageTime;
+import uet.kltn.judgment.constant.*;
 import uet.kltn.judgment.dto.request.user.SignUpRequestDto;
 import uet.kltn.judgment.dto.request.user.UpdateUserRequestDto;
 
@@ -52,17 +52,17 @@ public class User extends BaseEntity{
     @Column(name = "`birthday`", columnDefinition = "DATE", nullable = true)
     private Date birthday;
 
-    @Column(name = "`role`", columnDefinition = "TINYINT(10)", nullable = false)
+    @Column(name = "`role`", columnDefinition = "TINYINT(10) DEFAULT 4", nullable = true)
     private Integer role;
 
     @Column(name = "`usage_time`", columnDefinition = "TINYINT(10) DEFAULT 0", nullable = true)
     private Integer usageTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "unit_uid")
     private Unit unit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "work_uid")
     private Work work;
 
@@ -93,7 +93,7 @@ public class User extends BaseEntity{
     @Column(name = "`power`", columnDefinition = "TINYINT DEFAULT 4", nullable = false)
     private Integer power;
 
-    @Column(name = "`level`", columnDefinition = "TINYINT", nullable = true)
+    @Column(name = "`level`", columnDefinition = "TINYINT DEFAULT 0", nullable = true)
     private Integer level;
 
 
@@ -104,23 +104,24 @@ public class User extends BaseEntity{
         super();
         this.setUid(uid);
         if (signUpRequestDto.getState() != null)
-            this.setState(signUpRequestDto.getState());
+            this.setState(State.getByName(signUpRequestDto.getState()).getId());
         this.setCreated(LocalDateTime.now());
         this.password = password;
         this.name = signUpRequestDto.getName();
         this.email = signUpRequestDto.getEmail();
         if (signUpRequestDto.getLevel() != null)
-            this.level = signUpRequestDto.getLevel();
+            this.level = Level.getByName(signUpRequestDto.getLevel()).getId();
         if (signUpRequestDto.getUsageTime() != null)
-            this.usageTime = signUpRequestDto.getUsageTime();
+            this.usageTime = UsageTime.getByName(signUpRequestDto.getUsageTime()).getId();
         else
             this.usageTime = UsageTime.SEVEN_DAYS_TRIAL.getId();
         if (signUpRequestDto.getPhoneNumber() != null)
             this.phoneNumber = signUpRequestDto.getPhoneNumber();
-        this.role = signUpRequestDto.getRole();
+        if (signUpRequestDto.getRole() != null)
+            this.role = RoleUser.getByName(signUpRequestDto.getRole()).getId();
         if (signUpRequestDto.getNumberEmployee() != null)
             this.numberEmployee = signUpRequestDto.getNumberEmployee();
-        this.power = signUpRequestDto.getPower();
+        this.power = Power.getByName(signUpRequestDto.getPower()).getId();
         if (signUpRequestDto.getDescription() != null)
             this.description = signUpRequestDto.getDescription();
     }

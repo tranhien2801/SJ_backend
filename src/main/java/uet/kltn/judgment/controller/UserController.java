@@ -111,7 +111,6 @@ public class UserController extends GenController {
                 errorMap.put(DtoField.PARAM_EMAIL, error);
                 return responseUtil.getBadRequestResponse(errorMap);
             }
-
             user = userService.updateUser(user, updateUserRequestDto);
             return responseUtil.getSuccessResponse(user);
 
@@ -131,7 +130,7 @@ public class UserController extends GenController {
                 return responseUtil.getForbiddenResponse();
             }
 
-            User user = userService.getUserById(id);
+            User user = userService.getUserByIdAndState(id);
             if (user == null) {
                 return responseUtil.getNotFoundResponse(id);
             }
@@ -161,9 +160,12 @@ public class UserController extends GenController {
             ExpressionDto expressionDto = (ExpressionDto) params.get("expression");
             if ((userPrincipal.getAuthorities().contains(Power.STAFF.getAuthority()))) {
                 response = userService.getCurrentUser(expressionDto, userPrincipal.getUser().getUid());
-            } else
-                response = userService.getAllUser(expressionDto, Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId());
-
+            } else {
+                if (userPrincipal.getAuthorities().contains(Power.SYSTEM_ADMIN.getAuthority()))
+                    response = userService.getAllUser(expressionDto, Power.valueOf(userPrincipal.getAuthorities().stream().findFirst().orElseThrow().getAuthority()).getId(), userPrincipal.getId());
+                else if (userPrincipal.getAuthorities().contains(Power.MANAGER.getAuthority()))
+                    response = userService.getAllUserByUnit(expressionDto, userPrincipal.getId());
+            }
             return responseUtil.getSuccessResponse(response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,7 +204,7 @@ public class UserController extends GenController {
                 return responseUtil.getForbiddenResponse();
             }
 
-            User user = userService.getUserById(id);
+            User user = userService.getUserByIdAndState(id);
             if (user == null) {
                 return responseUtil.getNotFoundResponse(id);
             }

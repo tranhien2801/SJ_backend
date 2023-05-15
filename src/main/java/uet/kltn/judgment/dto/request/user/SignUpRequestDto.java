@@ -37,13 +37,13 @@ public class SignUpRequestDto {
     private String password;
 
     @JsonAlias("level")
-    private Integer level;
+    private String level;
 
     @JsonAlias("state")
-    private Integer state;
+    private String state;
 
     @JsonAlias("usage_time")
-    private Integer usageTime;
+    private String usageTime;
 
     @JsonAlias("functions")
     private Set<String> functions;
@@ -58,9 +58,8 @@ public class SignUpRequestDto {
     @JsonAlias("unit")
     private String unit;
 
-    @NotNull
     @JsonAlias("role")
-    private Integer role;
+    private String role;
 
     @JsonAlias("work")
     private String work;
@@ -69,7 +68,7 @@ public class SignUpRequestDto {
     private Integer numberEmployee;
 
     @JsonAlias("power")
-    private Integer power;
+    private String power;
 
     @JsonAlias("description")
     private String description;

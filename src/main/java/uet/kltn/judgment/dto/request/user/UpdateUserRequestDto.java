@@ -45,7 +45,6 @@ public class UpdateUserRequestDto {
     @JsonAlias("unit")
     private String unit;
 
-    @NotNull
     @JsonAlias("role")
     private String role;
 
